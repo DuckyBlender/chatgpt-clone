@@ -6,7 +6,7 @@
 	<!-- Center the content -->
 	<div class="flex justify-center items-center h-full p-8">
 		<!-- Set the width of the content -->
-		<div class="w-3/4">
+		<div class="w-11/12">
 			<!-- Set the background color and if the content is too high, make it scrollable-->
 			<div class="bg-gradient-to-bl from-slate-600 to-slate-700 rounded-lg p-4 overflow-y-auto">
 				<!-- Set the content -->

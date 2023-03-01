@@ -6,6 +6,30 @@
 	let messages: { name: string; message: string }[] = [];
 	var replying = false;
 
+	// On page load, check if the user has a name stored in localStorage
+	// if (localStorage.getItem('name') !== null) {
+	// 	name = localStorage.getItem('name') as string;
+	// 	loggedIn = true;
+	// }
+
+	function saveMessages() {
+		let text = '';
+		messages.forEach((msg) => {
+			text += msg.name + ': ' + msg.message + '\n';
+		});
+		let element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+		element.setAttribute('download', 'chat.txt');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+		// I have actually no idea how this works, copilot did it for me lol
+	}
+
 	// add messages to the array
 	function addMessage(name: string, message: string) {
 		messages = [...messages, { name, message }];
@@ -47,6 +71,10 @@
 	// so that it can be used in the next session
 	function startChatting() {
 		if (name !== '') {
+			if (name === 'ChatGPT') {
+				alert('Please enter a name other than ChatGPT');
+				return;
+			}
 			localStorage.setItem('name', name);
 			loggedIn = true;
 		} else {
@@ -58,14 +86,12 @@
 {#if loggedIn === false}
 	<div class="font-lexend text-center border-b-2 text-white mb-4">
 		<h1>Welcome to ChatGPT!</h1>
-		<p>ChatGPT is a chatbot that uses GPT-3.5 to generate responses to your messages.</p>
-		<p>It's still in development, so please be patient with it.</p>
-
+		<p>ChatGPT is a chatbot that uses GPT-3.5 to generate human-like responses to your messages.</p>
 		<p>To start, enter your name and click "Start Chatting".</p>
 	</div>
 	<div class="font-lexend text-center text-black">
-		<input type="text" bind:value={name} placeholder="Your name" class="rounded-md p-2" />
-		<button on:click={startChatting} class="text-white bg-blue-500 rounded-md p-2">
+		<input type="text" bind:value={name} placeholder="Your name" class="rounded-md p-2 shadow-md" />
+		<button on:click={startChatting} class="text-white bg-blue-500 rounded-md p-2 shadow-md">
 			<!-- On click start chatting -->
 			Start Chatting
 		</button>
@@ -74,29 +100,35 @@
 	<!-- If the user is logged in, show the chat -->
 	{#each messages as msg}
 		{#if msg.name === name}
-			<!-- using tailwind css -->
-			<div class="bg-blue-700 text-white rounded-lg p-2 my-2">
+			<!-- <div class="bg-blue-700 text-white rounded-lg p-2 my-2"> -->
+			<!-- To fix newlines -->
+			<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
 				{name}: {msg.message}
 			</div>
 		{:else}
-			<div class="bg-gray-700 text-white rounded-lg p-2 my-2">
+			<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
 				ChatGPT: {msg.message}
 			</div>
 		{/if}
 	{/each}
-	<input type="text" bind:value={message} placeholder="Your message" class="rounded-md p-2" />
+	<input
+		type="text"
+		bind:value={message}
+		placeholder="Your message"
+		class="rounded-md p-2 w-full mb-2 shadow-md"
+	/>
 	{#if replying}
 		<button
 			on:click={() => addMessage(name, message)}
 			disabled
-			class="bg-gray-500 text-white rounded-md p-2"
+			class="bg-gray-500 text-white rounded-md p-2 shadow-md"
 		>
 			Replying...
 		</button>
 	{:else}
 		<button
 			on:click={() => addMessage(name, message)}
-			class="bg-blue-500 text-white rounded-md p-2"
+			class="bg-blue-500 text-white rounded-md p-2 shadow-md"
 		>
 			<!-- On click reset the message -->
 			Reply
@@ -107,32 +139,23 @@
 			messages = [];
 			addMessage('ChatGPT', 'Ask me anything!');
 		}}
-		class="bg-blue-500 text-white rounded-md p-2"
+		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
 	>
 		<!-- On click reset the message -->
 		Reset
 	</button>
-	<button
-		on:click={() => {
-			let text = '';
-			messages.forEach((msg) => {
-				text += msg.name + ': ' + msg.message + '\n';
-			});
-			let element = document.createElement('a');
-			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-			element.setAttribute('download', 'chat.txt');
-
-			element.style.display = 'none';
-			document.body.appendChild(element);
-
-			element.click();
-
-			document.body.removeChild(element);
-			// I have actually no idea how this works, copilot did it for me lol
-		}}
-		class="bg-blue-500 text-white rounded-md p-2"
-	>
+	<button on:click={saveMessages} class="bg-blue-500 text-white rounded-md p-2 shadow-md">
 		<!-- On click get all of the messages and save them to a txt file -->
 		Save
+	</button>
+	<!-- Button for resetting the username -->
+	<button
+		on:click={() => {
+			localStorage.removeItem('name');
+			loggedIn = false;
+		}}
+		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
+	>
+		Reset Username
 	</button>
 {/if}
