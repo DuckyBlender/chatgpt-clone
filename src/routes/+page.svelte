@@ -121,6 +121,7 @@
 		bind:value={message}
 		on:keydown={(e) => {
 			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault();
 				addMessage(name, message);
 				message = '';
 			}
@@ -129,6 +130,7 @@
 		class="rounded-md p-2 w-full shadow-md"
 		rows="5"
 	/>
+
 	<!-- Small reminder that the user can adjust the height by dragging it -->
 	<p class="text-xs text-gray-500">
 		You can adjust the height of the input box by dragging the bottom of it
