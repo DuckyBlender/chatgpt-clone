@@ -4,7 +4,7 @@
 
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
-	let replying = false;
+	// todo: reply cooldown
 
 	function saveMessages() {
 		let text = '';
@@ -29,7 +29,6 @@
 		messages = [...messages, { name, message }];
 		if (name !== 'ChatGPT') {
 			// send the message to the server
-			replying = true;
 			let requestBody = {
 				model: 'gpt-3.5-turbo',
 				messages: messages.map((msg) => {
@@ -55,7 +54,6 @@
 					let response = res.choices[0].message.content;
 					addMessage('ChatGPT', response);
 				});
-			replying = false;
 		}
 	}
 
@@ -137,23 +135,14 @@
 	</p>
 
 	<div class="flex flex-row space-x-2">
-		{#if replying}
-			<button
-				on:click={() => addMessage(name, message)}
-				disabled
-				class="bg-gray-500 text-white rounded-md p-2 shadow-md flex-grow"
-			>
-				Replying...
-			</button>
-		{:else}
-			<button
-				on:click={() => addMessage(name, message)}
-				class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
-			>
-				<!-- On click reset the message -->
-				Reply
-			</button>
-		{/if}
+		<button
+			on:click={() => addMessage(name, message)}
+			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
+		>
+			<!-- On click reset the message -->
+			Reply
+		</button>
+
 		<button
 			on:click={() => {
 				messages = [];
