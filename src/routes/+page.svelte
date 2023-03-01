@@ -4,13 +4,7 @@
 
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
-	var replying = false;
-
-	// On page load, check if the user has a name stored in localStorage
-	// if (localStorage.getItem('name') !== null) {
-	// 	name = localStorage.getItem('name') as string;
-	// 	loggedIn = true;
-	// }
+	let replying = false;
 
 	function saveMessages() {
 		let text = '';
@@ -61,7 +55,6 @@
 					let response = res.choices[0].message.content;
 					addMessage('ChatGPT', response);
 				});
-			console.log('replying: ' + replying);
 			replying = false;
 		}
 	}
@@ -85,12 +78,24 @@
 
 {#if loggedIn === false}
 	<div class="font-lexend text-center border-b-2 text-white mb-4">
-		<h1>Welcome to ChatGPT!</h1>
+		<h1 class="text-4xl pb-2">Welcome to ChatGPT</h1>
 		<p>ChatGPT is a chatbot that uses GPT-3.5 to generate human-like responses to your messages.</p>
 		<p>To start, enter your name and click "Start Chatting".</p>
 	</div>
-	<div class="font-lexend text-center text-black">
-		<input type="text" bind:value={name} placeholder="Your name" class="rounded-md p-2 shadow-md" />
+	<div
+		class="font-lexend text-center text-black flex flex-row justify-center items-center space-x-2"
+	>
+		<input
+			type="text"
+			bind:value={name}
+			on:keydown={(e) => {
+				if (e.key === 'Enter' && name !== '') {
+					startChatting();
+				}
+			}}
+			placeholder="Your name"
+			class="rounded-md p-2 shadow-md flex-grow"
+		/>
 		<button on:click={startChatting} class="text-white bg-blue-500 rounded-md p-2 shadow-md">
 			<!-- On click start chatting -->
 			Start Chatting
@@ -111,51 +116,65 @@
 			</div>
 		{/if}
 	{/each}
-	<input
-		type="text"
+	<!-- To fix shift+enter functionality in the above input, we need to use a textarea -->
+	<textarea
 		bind:value={message}
+		on:keydown={(e) => {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				addMessage(name, message);
+				message = '';
+			}
+		}}
 		placeholder="Your message"
-		class="rounded-md p-2 w-full mb-2 shadow-md"
+		class="rounded-md p-2 w-full shadow-md"
+		rows="5"
 	/>
-	{#if replying}
+	<!-- Small reminder that the user can adjust the height by dragging it -->
+	<p class="text-xs text-gray-500">
+		You can adjust the height of the input box by dragging the bottom of it
+	</p>
+
+	<div class="flex flex-row space-x-2">
+		{#if replying}
+			<button
+				on:click={() => addMessage(name, message)}
+				disabled
+				class="bg-gray-500 text-white rounded-md p-2 shadow-md flex-grow"
+			>
+				Replying...
+			</button>
+		{:else}
+			<button
+				on:click={() => addMessage(name, message)}
+				class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
+			>
+				<!-- On click reset the message -->
+				Reply
+			</button>
+		{/if}
 		<button
-			on:click={() => addMessage(name, message)}
-			disabled
-			class="bg-gray-500 text-white rounded-md p-2 shadow-md"
-		>
-			Replying...
-		</button>
-	{:else}
-		<button
-			on:click={() => addMessage(name, message)}
+			on:click={() => {
+				messages = [];
+				addMessage('ChatGPT', 'Ask me anything!');
+			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md"
 		>
 			<!-- On click reset the message -->
-			Reply
+			Reset
 		</button>
-	{/if}
-	<button
-		on:click={() => {
-			messages = [];
-			addMessage('ChatGPT', 'Ask me anything!');
-		}}
-		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
-	>
-		<!-- On click reset the message -->
-		Reset
-	</button>
-	<button on:click={saveMessages} class="bg-blue-500 text-white rounded-md p-2 shadow-md">
-		<!-- On click get all of the messages and save them to a txt file -->
-		Save
-	</button>
-	<!-- Button for resetting the username -->
-	<button
-		on:click={() => {
-			localStorage.removeItem('name');
-			loggedIn = false;
-		}}
-		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
-	>
-		Reset Username
-	</button>
+		<button on:click={saveMessages} class="bg-blue-500 text-white rounded-md p-2 shadow-md">
+			<!-- On click get all of the messages and save them to a txt file -->
+			Save
+		</button>
+		<!-- Button for resetting the username -->
+		<button
+			on:click={() => {
+				localStorage.removeItem('name');
+				loggedIn = false;
+			}}
+			class="bg-blue-500 text-white rounded-md p-2 shadow-md"
+		>
+			Reset Username
+		</button>
+	</div>
 {/if}

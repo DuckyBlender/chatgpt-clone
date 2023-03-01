@@ -8,7 +8,9 @@
 		<!-- Set the width of the content -->
 		<div class="w-11/12">
 			<!-- Set the background color and if the content is too high, make it scrollable-->
-			<div class="bg-gradient-to-bl from-slate-600 to-slate-700 rounded-lg p-4 overflow-y-auto">
+			<div
+				class="bg-gradient-to-bl from-slate-600 to-slate-700 rounded-lg p-4 overflow-y-auto shadow-md"
+			>
 				<!-- Set the content -->
 				<slot />
 			</div>
