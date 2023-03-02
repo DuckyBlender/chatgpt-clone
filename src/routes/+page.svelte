@@ -1,10 +1,15 @@
 <script lang="ts">
+	import { tweened } from 'svelte/motion';
 	let name = '';
 	let loggedIn = false;
 
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
-	// todo: reply cooldown
+	var thinking = false;
+	const timeout = 3;
+	// Global cooldown bool which can be changed from a function
+	let cooldown = false;
+	// TODO: Add a cooldown to the button
 
 	function saveMessages() {
 		let text = '';
@@ -26,6 +31,8 @@
 
 	// add messages to the array
 	function addMessage(name: string, message: string) {
+		if (cooldown) return;
+		// buttonCooldown();
 		messages = [...messages, { name, message }];
 		if (name !== 'ChatGPT') {
 			// send the message to the server
@@ -38,6 +45,8 @@
 					};
 				})
 			};
+
+			thinking = true;
 			fetch('https://api.openai.com/v1/chat/completions', {
 				method: 'POST',
 				headers: {
@@ -54,6 +63,8 @@
 					let response = res.choices[0].message.content;
 					addMessage('ChatGPT', response);
 				});
+			// Start a 3 second timer
+			thinking = false;
 		}
 	}
 
@@ -87,7 +98,8 @@
 			type="text"
 			bind:value={name}
 			on:keydown={(e) => {
-				if (e.key === 'Enter' && name !== '') {
+				if (e.key === 'Enter') {
+					e.preventDefault();
 					startChatting();
 				}
 			}}
@@ -113,6 +125,12 @@
 				ChatGPT: {msg.message}
 			</div>
 		{/if}
+		{#if thinking}
+			<!-- To make this div work we need to add a new variable called thinking to the script tag with a default value of false -->
+			<div class="bg-gray-800 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+				ChatGPT: Thinking...
+			</div>
+		{/if}
 	{/each}
 	<!-- To fix shift+enter functionality in the above input, we need to use a textarea -->
 	<textarea
@@ -129,6 +147,10 @@
 		rows="5"
 		id="messageInput"
 	/>
+	<!-- Focus the textview when the page loads -->
+	<script>
+		document.getElementById('messageInput').focus();
+	</script>
 
 	<!-- Small reminder that the user can adjust the height by dragging it -->
 	<p class="text-xs text-gray-500">
@@ -136,13 +158,20 @@
 	</p>
 
 	<div class="flex flex-row space-x-2">
-		<button
-			on:click={() => addMessage(name, message)}
-			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
-		>
-			<!-- On click reset the message -->
-			Reply
-		</button>
+		{#if cooldown === false}
+			<button
+				on:click={() => addMessage(name, message)}
+				class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
+			>
+				<!-- On click reset the message -->
+				Reply
+			</button>
+		{:else}
+			<button disabled class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow">
+				<!-- On click reset the message -->
+				Reply
+			</button>
+		{/if}
 
 		<button
 			on:click={() => {
