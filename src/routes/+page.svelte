@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
-	import Layout from './+layout.svelte';
 	let username = 'Human';
 
 	let message = '';
@@ -39,7 +38,7 @@
 	}
 
 	// add messages to the array
-	function addMessage(name: string, message: string) {
+	async function addMessage(name: string, message: string) {
 		if (cooldown) return;
 		// buttonCooldown();
 		messages = [...messages, { name, message }];
@@ -57,24 +56,25 @@
 		};
 
 		thinking = true;
-		fetch('https://api.openai.com/v1/chat/completions', {
+		let res = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST',
 			headers: {
-				// Authorization: 'Bearer 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',
+				// to hide this from the public, I have added this to the .env file
 				Authorization: 'Bearer ' + import.meta.env.VITE_OPENAI_API_KEY,
+				// to set this up in svelte using vite
 				'Content-Type': 'application/json'
 			},
 
 			body: JSON.stringify(requestBody)
-		})
-			.then((res) => res.json())
-			.then((res) => {
-				// get the response from the server
-				console.log(res);
-				let response = res.choices[0].message.content;
-				addMessage('ChatGPT', response);
-			});
-		// Start a 3 second timer
+		});
+		// get the response from the server
+		if (res.ok) {
+			let response = (await res.json()).choices[0].message.content;
+			console.log(response);
+			addMessage('ChatGPT', response);
+		} else {
+			addMessage('ChatGPT', 'Something went wrong, please try again later.');
+		}
 		thinking = false;
 	}
 
@@ -87,17 +87,24 @@
 		<!-- <div class="bg-blue-700 text-white rounded-lg p-2 my-2"> -->
 		<!-- To fix newlines -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			{name}: {msg.message}
+			{msg.message}
 		</div>
 	{:else}
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			ChatGPT: {msg.message}
+			{msg.message}
 		</div>
 	{/if}
 	{#if thinking}
 		<!-- To make this div work we need to add a new variable called thinking to the script tag with a default value of false -->
 		<div class="bg-gray-800 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			ChatGPT: Thinking...
+			Thinking...
+			<!-- inser an loading svg -->
+			<svg
+				class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+			/>
 		</div>
 	{/if}
 {/each}
