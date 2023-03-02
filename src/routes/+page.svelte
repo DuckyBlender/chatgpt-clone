@@ -127,6 +127,7 @@
 		placeholder="Your message"
 		class="rounded-md p-2 w-full shadow-md"
 		rows="5"
+		id="messageInput"
 	/>
 
 	<!-- Small reminder that the user can adjust the height by dragging it -->
@@ -147,6 +148,7 @@
 			on:click={() => {
 				messages = [];
 				addMessage('ChatGPT', 'Ask me anything!');
+				message = '';
 			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md"
 		>

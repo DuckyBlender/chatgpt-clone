@@ -2,7 +2,7 @@
 	import '../app.css';
 </script>
 
-<div class="bg-gradient-to-bl from-blue-800 to-blue-900 min-h-screen">
+<div class="bg-gradient-to-l from-blue-600 to-blue-900 min-h-screen">
 	<!-- Center the content -->
 	<div class="flex justify-center items-center h-full p-8">
 		<!-- Set the width of the content -->
