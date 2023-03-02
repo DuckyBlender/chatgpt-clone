@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tweened } from 'svelte/motion';
+	import Layout from './+layout.svelte';
 	let name = '';
 	let loggedIn = false;
 
@@ -178,6 +179,13 @@
 				messages = [];
 				addMessage('ChatGPT', 'Ask me anything!');
 				message = '';
+				// Also reset the textview
+				let input = document.getElementById('messageInput');
+				if (input !== null) {
+					// input.value doesnt work
+					input.innerText = '';
+					input.focus();
+				}
 			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md"
 		>
