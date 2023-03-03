@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { tweened } from 'svelte/motion';
+	import { concurrent } from 'svelte-typewriter';
+
 	let username = 'Human';
 
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
 	var thinking = false;
 	const timeout = 3;
-	// Global cooldown bool which can be changed from a function
+
+	let cooldownTimer = 0;
 	let cooldown = false;
 	// TODO: Add a cooldown to the button
 
@@ -41,7 +43,7 @@
 	async function addMessage(name: string, message: string) {
 		messages = [...messages, { name, message }];
 		if (name === 'ChatGPT') return;
-		cooldown = true;
+		thinking = true;
 		// send the message to the server
 		let requestBody = {
 			model: 'gpt-3.5-turbo',
@@ -74,15 +76,18 @@
 		} else {
 			addMessage('ChatGPT', 'Something went wrong, please try again later.');
 		}
+		thinking = false;
 		// button cooldown, run it in the background
 		buttonCooldown(); // without async to not wait for it
-		thinking = false;
 	}
 
 	// Async function to add a cooldown to the button
 	async function buttonCooldown() {
 		cooldown = true;
-		await new Promise((r) => setTimeout(r, timeout * 1000));
+		for (let i = timeout; i > 0; i--) {
+			cooldownTimer = i;
+			await new Promise((r) => setTimeout(r, 1000));
+		}
 		cooldown = false;
 	}
 
@@ -94,15 +99,22 @@
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<!-- Import the openai.svg -->
-			{msg.message}
+			<img
+				src="/openai.svg"
+				class="w-6 h-6 inline-block filter invert align-top"
+				alt="OpenAI Logo"
+			/>
+			<span use:concurrent={{ interval: 0 }} class="inline-block">
+				{msg.message}
+			</span>
 		</div>
 	{:else}
 		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+			<img src="/default.svg" class="w-6 h-6 inline-block align-top" alt="OpenAI Logo" />
 			{msg.message}
 			<script>
-				console.log(msg.message);
+				console.log(msg.message); // For debugging
 			</script>
 		</div>
 	{/if}
@@ -139,24 +151,34 @@
 </p>
 
 <div class="flex flex-row space-x-2">
-	{#if cooldown === false}
+	{#if thinking}
+		<button disabled class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow">
+			<!-- On click reset the message -->
+			Thinking...
+		</button>
+	{:else if cooldown}
+		<button disabled class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow">
+			<!-- On click reset the message -->
+			Cooldown... {cooldownTimer}s
+		</button>
+	{:else}
 		<button
 			on:click={() => {
 				if (message.trim() === '') return;
 				addMessage(username, message);
+				message = '';
+				// refocus the input
+				let input = document.getElementById('messageInput');
+				if (input !== null) {
+					input.focus();
+				}
 			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
 		>
 			<!-- On click reset the message -->
 			Reply
 		</button>
-	{:else}
-		<button disabled class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow">
-			<!-- On click reset the message -->
-			Reply
-		</button>
 	{/if}
-
 	<button
 		on:click={() => {
 			messages = [];
@@ -165,8 +187,6 @@
 			// Also reset the textview
 			let input = document.getElementById('messageInput');
 			if (input !== null) {
-				// input.value doesnt work
-				input.innerText = '';
 				input.focus();
 			}
 		}}
