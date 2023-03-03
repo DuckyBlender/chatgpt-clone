@@ -94,12 +94,13 @@
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<!-- Import the openai.svg -->
+			<img src="/openai.svg" class="w-6 h-6 inline-block filter invert" alt="OpenAI Logo" />
 			{msg.message}
 		</div>
 	{:else}
 		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+			<img src="/default.svg" class="w-6 h-6 inline-block" alt="OpenAI Logo" />
 			{msg.message}
 			<script>
 				console.log(msg.message);
