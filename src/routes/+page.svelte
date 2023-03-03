@@ -108,6 +108,7 @@
 	bind:value={message}
 	on:keydown={(e) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
+			if (message.trim() === '') return;
 			e.preventDefault();
 			addMessage(username, message);
 			message = '';
@@ -127,7 +128,10 @@
 <div class="flex flex-row space-x-2">
 	{#if cooldown === false}
 		<button
-			on:click={() => addMessage(username, message)}
+			on:click={() => {
+				if (message.trim() === '') return;
+				addMessage(username, message);
+			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
 		>
 			<!-- On click reset the message -->
