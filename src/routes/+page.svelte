@@ -25,11 +25,9 @@
 		// To do this, I have to add a class to the button, and then remove it after 0.5 seconds
 		if (button !== null) {
 			button.classList.add('animate-shake');
-			console.log('Shaking button');
 			setTimeout(() => {
 				button?.classList.remove('animate-shake');
 			}, 1000);
-			console.log('Stopped shaking button');
 		}
 	}
 
@@ -83,11 +81,10 @@
 		// get the response from the server
 		if (res.ok) {
 			let response = (await res.json()).choices[0].message.content;
-			console.log(response);
 			addMessage('ChatGPT', response);
-			console.log(messages);
 		} else {
 			addMessage('ChatGPT', 'Something went wrong, please try again later.');
+			console.error(res);
 		}
 		thinking = false;
 		// button cooldown, run it in the background

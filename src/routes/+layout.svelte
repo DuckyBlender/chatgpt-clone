@@ -20,7 +20,7 @@
 				</div>
 				<div class="text-right">
 					<!-- Title -->
-					<h1 class="text-md text-white font-light mb-1">Website by: DuckyBlender</h1>
+					<h1 class="text-md text-white font-light mb-1">Website hacked by: JacobSparrow</h1>
 					<!-- Subtitle -->
 					<p class="text-sm font-light text-gray-300">Beta 0.7</p>
 				</div>
