@@ -109,12 +109,43 @@
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<img
-				src="/openai.svg"
-				class="w-6 h-6 inline-block filter invert align-top mr-1"
-				alt="OpenAI Logo"
-			/>
+			<img src="/openai.svg" class="w-6 h-6 inline-block align-top mr-1" alt="OpenAI Logo" />
 			{msg.message}
+			<div class="float-right text-gray-500 align-top inline-block w-6 h-6 filter invert">
+				<!-- Copy icon -->
+				<button
+					on:click={() => {
+						navigator.clipboard.writeText(msg.message);
+					}}
+				>
+					<img src="/copy.svg" class="w-6 h-6 inline-block" alt="Copy" />
+				</button>
+			</div>
+			<!-- Check if this is the last message in the conversation. Also check if it is from the bot -->
+			{#if msg === messages[messages.length - 1] && msg.name === 'ChatGPT'}
+				<!-- Regenerate icon -->
+				<div class="float-right text-gray-500 align-top inline-block w-6 h-6 filter invert">
+					<button
+						on:click={() => {
+							if (thinking) return;
+							if (cooldown) {
+								shakeButton();
+								return;
+							}
+							// save the last human message
+							let lastMessage = messages[messages.length - 2];
+							// remove the last bot message
+							messages.pop();
+							// remove the last message with the user message
+							messages.pop();
+							// add a new message to generate a new response
+							addMessage(lastMessage.name, lastMessage.message);
+						}}
+					>
+						<img src="/regen.svg" class="w-6 h-6 inline-block px-1" alt="Regenerate" />
+					</button>
+				</div>
+			{/if}
 		</div>
 	{:else}
 		<!-- Human -->
