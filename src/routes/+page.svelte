@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { tweened } from 'svelte/motion';
+	import { concurrent } from 'svelte-typewriter';
+
 	let username = 'Human';
 
 	let message = '';
@@ -98,13 +99,19 @@
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<img src="/openai.svg" class="w-6 h-6 inline-block filter invert" alt="OpenAI Logo" />
-			{msg.message}
+			<img
+				src="/openai.svg"
+				class="w-6 h-6 inline-block filter invert align-top"
+				alt="OpenAI Logo"
+			/>
+			<span use:concurrent={{ interval: 0 }} class="inline-block">
+				{msg.message}
+			</span>
 		</div>
 	{:else}
 		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<img src="/default.svg" class="w-6 h-6 inline-block" alt="OpenAI Logo" />
+			<img src="/default.svg" class="w-6 h-6 inline-block align-top" alt="OpenAI Logo" />
 			{msg.message}
 			<script>
 				console.log(msg.message); // For debugging
@@ -159,6 +166,12 @@
 			on:click={() => {
 				if (message.trim() === '') return;
 				addMessage(username, message);
+				message = '';
+				// refocus the input
+				let input = document.getElementById('messageInput');
+				if (input !== null) {
+					input.focus();
+				}
 			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
 		>
@@ -174,8 +187,6 @@
 			// Also reset the textview
 			let input = document.getElementById('messageInput');
 			if (input !== null) {
-				// input.value doesnt work
-				input.innerText = '';
 				input.focus();
 			}
 		}}
