@@ -84,30 +84,25 @@
 <!-- If the user is logged in, show the chat -->
 {#each messages as msg}
 	{#if msg.name === username}
-		<!-- <div class="bg-blue-700 text-white rounded-lg p-2 my-2"> -->
-		<!-- To fix newlines -->
+		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
 			{msg.message}
+			<script>
+				console.log(msg.message);
+			</script>
 		</div>
 	{:else}
+		<!-- ChatGPT -->
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
 			{msg.message}
 		</div>
 	{/if}
-	{#if thinking}
-		<!-- To make this div work we need to add a new variable called thinking to the script tag with a default value of false -->
-		<div class="bg-gray-800 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			Thinking...
-			<!-- inser an loading svg -->
-			<svg
-				class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-			/>
-		</div>
-	{/if}
 {/each}
+{#if thinking}
+	<div class="bg-gray-700 text-gray-500 rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+		Thinking...
+	</div>
+{/if}
 <!-- To fix shift+enter functionality in the above input, we need to use a textarea -->
 <textarea
 	bind:value={message}
@@ -120,7 +115,7 @@
 	}}
 	placeholder="Your message"
 	class="rounded-md p-2 w-full shadow-md"
-	rows="5"
+	rows="3"
 	id="messageInput"
 />
 
