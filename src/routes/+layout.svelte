@@ -4,14 +4,15 @@
 
 <div class="bg-gradient-to-l from-blue-900 to-red-900 min-h-screen -z-10">
 	<!-- Center the content -->
-	<div class="flex justify-center items-center h-full p-8">
+	<!-- padding top 4 -->
+	<div class="flex justify-center items-center h-full p-4">
 		<!-- Set the width of the content -->
-		<div class="w-11/12">
+		<div class="w-full">
 			<!-- Header -->
 			<div
-				class="bg-gradient-to-bl from-slate-600 to-slate-700 rounded-lg p-4 shadow-md mb-4 flex flex-row justify-between"
+				class="bg-gradient-to-bl from-slate-600 to-slate-700 rounded-lg p-4 shadow-xl mb-4 flex flex-row justify-between overflow-auto"
 			>
-				<div>
+				<div class="text-left">
 					<!-- Title -->
 					<h1 class="text-2xl text-white font-bold">ChatGPT</h1>
 					<!-- Subtitle -->
@@ -19,9 +20,9 @@
 				</div>
 				<div class="text-right">
 					<!-- Title -->
-					<h1 class="text-md text-white font-light">Website by: DuckyBlender</h1>
+					<h1 class="text-md text-white font-light mb-1">Website by: DuckyBlender</h1>
 					<!-- Subtitle -->
-					<p class="text-sm font-light text-gray-300">Version 1.0.0</p>
+					<p class="text-sm font-light text-gray-300">Beta 0.7</p>
 				</div>
 			</div>
 
@@ -35,4 +36,3 @@
 		</div>
 	</div>
 </div>
-<!-- slot is a placeholder for the content of the page -->

@@ -20,6 +20,19 @@
 		}
 	});
 
+	function shakeButton() {
+		let button = document.getElementById('sendButton');
+		// To do this, I have to add a class to the button, and then remove it after 0.5 seconds
+		if (button !== null) {
+			button.classList.add('animate-shake');
+			console.log('Shaking button');
+			setTimeout(() => {
+				button?.classList.remove('animate-shake');
+			}, 1000);
+			console.log('Stopped shaking button');
+		}
+	}
+
 	function saveMessages() {
 		let text = '';
 		messages.forEach((msg) => {
@@ -40,6 +53,7 @@
 
 	// add messages to the array
 	async function addMessage(name: string, message: string) {
+		message = message.trim();
 		messages = [...messages, { name, message }];
 		if (name === 'ChatGPT') return;
 		thinking = true;
@@ -100,7 +114,7 @@
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
 			<img
 				src="/openai.svg"
-				class="w-6 h-6 inline-block filter invert align-top"
+				class="w-6 h-6 inline-block filter invert align-top mr-1"
 				alt="OpenAI Logo"
 			/>
 			{msg.message}
@@ -108,17 +122,35 @@
 	{:else}
 		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<img src="/default.svg" class="w-6 h-6 inline-block align-top" alt="OpenAI Logo" />
+			<img src="/default.svg" class="w-6 h-6 inline-block align-top mr-1" alt="OpenAI Logo" />
 			{msg.message}
-			<script>
-				console.log(msg.message); // For debugging
-			</script>
 		</div>
 	{/if}
 {/each}
 {#if thinking}
 	<div class="bg-gray-700 text-gray-500 rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-		Thinking...
+		<svg
+			class="animate-spin text-white inline-block h-5 w-5 align-middle mr-1"
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<circle
+				class="opacity-25 inline-block"
+				cx="12"
+				cy="12"
+				r="10"
+				stroke="currentColor"
+				stroke-width="4"
+			/>
+			<path
+				class="opacity-75 inline-block"
+				fill="currentColor"
+				d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+			/>
+		</svg>
+		<!-- Got this SVG code from the tailwind website -->
+		<span class="animate-pulse">Thinking...</span>
 	</div>
 {/if}
 <!-- To fix shift+enter functionality in the above input, we need to use a textarea -->
@@ -126,8 +158,9 @@
 	bind:value={message}
 	on:keydown={(e) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
-			if (cooldown) {
+			if (cooldown || thinking) {
 				e.preventDefault();
+				shakeButton();
 				return;
 			}
 			if (message.trim() === '') return;
@@ -149,13 +182,19 @@
 
 <div class="flex flex-row space-x-2">
 	{#if thinking}
-		<button disabled class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow">
-			<!-- On click reset the message -->
+		<button
+			disabled
+			class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow"
+			id="sendButton"
+		>
 			Thinking...
 		</button>
 	{:else if cooldown}
-		<button disabled class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow">
-			<!-- On click reset the message -->
+		<button
+			disabled
+			class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow"
+			id="sendButton"
+		>
 			Cooldown... {cooldownTimer}s
 		</button>
 	{:else}
@@ -171,8 +210,8 @@
 				}
 			}}
 			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
+			id="sendButton"
 		>
-			<!-- On click reset the message -->
 			Reply
 		</button>
 	{/if}
@@ -189,10 +228,19 @@
 		}}
 		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
 	>
-		<!-- On click reset the message -->
 		Reset
 	</button>
-	<button on:click={saveMessages} class="bg-blue-500 text-white rounded-md p-2 shadow-md">
+	<button
+		on:click={() => {
+			saveMessages();
+			// Also reset the textview
+			let input = document.getElementById('messageInput');
+			if (input !== null) {
+				input.focus();
+			}
+		}}
+		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
+	>
 		<!-- On click get all of the messages and save them to a txt file -->
 		Save
 	</button>
