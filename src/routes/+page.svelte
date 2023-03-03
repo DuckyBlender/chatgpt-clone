@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { concurrent } from 'svelte-typewriter';
 
 	let username = 'Human';
 
@@ -104,9 +103,7 @@
 				class="w-6 h-6 inline-block filter invert align-top"
 				alt="OpenAI Logo"
 			/>
-			<span use:concurrent={{ interval: 0 }} class="inline-block">
-				{msg.message}
-			</span>
+			{msg.message}
 		</div>
 	{:else}
 		<!-- Human -->
