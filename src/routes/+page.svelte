@@ -39,7 +39,6 @@
 
 	// add messages to the array
 	async function addMessage(name: string, message: string) {
-		if (cooldown) return;
 		messages = [...messages, { name, message }];
 		if (name === 'ChatGPT') return;
 		cooldown = true;
@@ -71,6 +70,7 @@
 			let response = (await res.json()).choices[0].message.content;
 			console.log(response);
 			addMessage('ChatGPT', response);
+			console.log(messages);
 		} else {
 			addMessage('ChatGPT', 'Something went wrong, please try again later.');
 		}
@@ -91,18 +91,19 @@
 
 <!-- If the user is logged in, show the chat -->
 {#each messages as msg}
-	{#if msg.name === username}
+	{#if msg.name === 'ChatGPT'}
+		<!-- ChatGPT -->
+		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+			<!-- Import the openai.svg -->
+			{msg.message}
+		</div>
+	{:else}
 		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
 			{msg.message}
 			<script>
 				console.log(msg.message);
 			</script>
-		</div>
-	{:else}
-		<!-- ChatGPT -->
-		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			{msg.message}
 		</div>
 	{/if}
 {/each}
@@ -116,6 +117,10 @@
 	bind:value={message}
 	on:keydown={(e) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
+			if (cooldown) {
+				e.preventDefault();
+				return;
+			}
 			if (message.trim() === '') return;
 			e.preventDefault();
 			addMessage(username, message);
