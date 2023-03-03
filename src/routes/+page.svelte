@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
-	import Layout from './+layout.svelte';
 	let username = 'Human';
 
 	let message = '';
@@ -39,7 +38,7 @@
 	}
 
 	// add messages to the array
-	function addMessage(name: string, message: string) {
+	async function addMessage(name: string, message: string) {
 		if (cooldown) return;
 		// buttonCooldown();
 		messages = [...messages, { name, message }];
@@ -57,24 +56,25 @@
 		};
 
 		thinking = true;
-		fetch('https://api.openai.com/v1/chat/completions', {
+		let res = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST',
 			headers: {
-				// Authorization: 'Bearer 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',
+				// to hide this from the public, I have added this to the .env file
 				Authorization: 'Bearer ' + import.meta.env.VITE_OPENAI_API_KEY,
+				// to set this up in svelte using vite
 				'Content-Type': 'application/json'
 			},
 
 			body: JSON.stringify(requestBody)
-		})
-			.then((res) => res.json())
-			.then((res) => {
-				// get the response from the server
-				console.log(res);
-				let response = res.choices[0].message.content;
-				addMessage('ChatGPT', response);
-			});
-		// Start a 3 second timer
+		});
+		// get the response from the server
+		if (res.ok) {
+			let response = (await res.json()).choices[0].message.content;
+			console.log(response);
+			addMessage('ChatGPT', response);
+		} else {
+			addMessage('ChatGPT', 'Something went wrong, please try again later.');
+		}
 		thinking = false;
 	}
 
@@ -84,23 +84,25 @@
 <!-- If the user is logged in, show the chat -->
 {#each messages as msg}
 	{#if msg.name === username}
-		<!-- <div class="bg-blue-700 text-white rounded-lg p-2 my-2"> -->
-		<!-- To fix newlines -->
+		<!-- Human -->
 		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			{name}: {msg.message}
+			{msg.message}
+			<script>
+				console.log(msg.message);
+			</script>
 		</div>
 	{:else}
+		<!-- ChatGPT -->
 		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			ChatGPT: {msg.message}
-		</div>
-	{/if}
-	{#if thinking}
-		<!-- To make this div work we need to add a new variable called thinking to the script tag with a default value of false -->
-		<div class="bg-gray-800 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			ChatGPT: Thinking...
+			{msg.message}
 		</div>
 	{/if}
 {/each}
+{#if thinking}
+	<div class="bg-gray-700 text-gray-500 rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+		Thinking...
+	</div>
+{/if}
 <!-- To fix shift+enter functionality in the above input, we need to use a textarea -->
 <textarea
 	bind:value={message}
@@ -113,7 +115,7 @@
 	}}
 	placeholder="Your message"
 	class="rounded-md p-2 w-full shadow-md"
-	rows="5"
+	rows="3"
 	id="messageInput"
 />
 
