@@ -40,10 +40,9 @@
 	// add messages to the array
 	async function addMessage(name: string, message: string) {
 		if (cooldown) return;
-		// buttonCooldown();
 		messages = [...messages, { name, message }];
 		if (name === 'ChatGPT') return;
-
+		cooldown = true;
 		// send the message to the server
 		let requestBody = {
 			model: 'gpt-3.5-turbo',
@@ -75,7 +74,16 @@
 		} else {
 			addMessage('ChatGPT', 'Something went wrong, please try again later.');
 		}
+		// button cooldown, run it in the background
+		buttonCooldown(); // without async to not wait for it
 		thinking = false;
+	}
+
+	// Async function to add a cooldown to the button
+	async function buttonCooldown() {
+		cooldown = true;
+		await new Promise((r) => setTimeout(r, timeout * 1000));
+		cooldown = false;
 	}
 
 	addMessage('ChatGPT', 'Ask me anything!');
@@ -138,7 +146,7 @@
 			Reply
 		</button>
 	{:else}
-		<button disabled class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow">
+		<button disabled class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow">
 			<!-- On click reset the message -->
 			Reply
 		</button>
