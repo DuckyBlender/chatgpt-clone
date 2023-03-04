@@ -123,8 +123,7 @@
 						// so let's use the index of the message
 						let button = document.getElementById('copyButton' + messages.indexOf(msg));
 						if (button !== null) {
-							button.innerHTML =
-								'<img src="/tick.svg" class="w-6 h-6 inline-block filter invert" alt="Check" />';
+							button.innerHTML = '<img src="/tick.svg" class="w-6 h-6 inline-block" alt="Check" />';
 							setTimeout(() => {
 								if (button !== null)
 									button.innerHTML =

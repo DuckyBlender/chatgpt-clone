@@ -20,9 +20,9 @@
 				</div>
 				<div class="text-right">
 					<!-- Title -->
-					<h1 class="text-md text-white font-light mb-1">Website by: DuckyBlender</h1>
+					<h1 class="text-md text-white font-light mb-1">Website by DuckyBlender</h1>
 					<!-- Subtitle -->
-					<p class="text-sm font-light text-gray-300">Beta b0.7</p>
+					<p class="text-sm font-light text-gray-300">1.0</p>
 				</div>
 			</div>
 
