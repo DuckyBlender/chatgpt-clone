@@ -113,9 +113,24 @@
 			{msg.message}
 			<div class="float-right text-gray-500 align-top inline-block w-6 h-6 filter invert">
 				<!-- Copy icon -->
+				<!-- Id is the index of the message -->
 				<button
+					id={'copyButton' + messages.indexOf(msg)}
 					on:click={() => {
 						navigator.clipboard.writeText(msg.message);
+						// Change the icon to a checkmark for 1 second
+						// we can't use the id because it is not unique
+						// so let's use the index of the message
+						let button = document.getElementById('copyButton' + messages.indexOf(msg));
+						if (button !== null) {
+							button.innerHTML =
+								'<img src="/tick.svg" class="w-6 h-6 inline-block filter invert" alt="Check" />';
+							setTimeout(() => {
+								if (button !== null)
+									button.innerHTML =
+										'<img src="/copy.svg" class="w-6 h-6 inline-block" alt="Copy" />';
+							}, 1000);
+						}
 					}}
 				>
 					<img src="/copy.svg" class="w-6 h-6 inline-block" alt="Copy" />
