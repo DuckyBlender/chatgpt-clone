@@ -109,7 +109,7 @@
 		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
 			<img
 				src="/openai.svg"
-				class="mr-1 inline-block h-6 w-6 align-top invert filter"
+				class="mr-1 inline-block h-6 w-6 align-top"
 				alt="OpenAI Logo"
 			/>
 			{msg.message}
