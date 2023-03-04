@@ -10,7 +10,6 @@
 
 	let cooldownTimer = 0;
 	let cooldown = false;
-	// TODO: Add a cooldown to the button
 
 	// Focus the textview
 	onMount(() => {
@@ -46,7 +45,7 @@
 		element.click();
 
 		document.body.removeChild(element);
-		// I have actually no idea how this works, copilot did it for me lol
+		// I have actually no idea how this works, copilot did it for me lolol
 	}
 
 	// add messages to the array
@@ -87,7 +86,6 @@
 			console.error(res);
 		}
 		thinking = false;
-		// button cooldown, run it in the background
 		buttonCooldown(); // without async to not wait for it
 	}
 
@@ -108,10 +106,14 @@
 {#each messages as msg}
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
-		<div class="bg-gray-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<img src="/openai.svg" class="w-6 h-6 inline-block align-top mr-1" alt="OpenAI Logo" />
+		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
+			<img
+				src="/openai.svg"
+				class="mr-1 inline-block h-6 w-6 align-top invert filter"
+				alt="OpenAI Logo"
+			/>
 			{msg.message}
-			<div class="float-right text-gray-500 align-top inline-block w-6 h-6 filter invert">
+			<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
 				<!-- Copy icon -->
 				<!-- Id is the index of the message -->
 				<button
@@ -132,13 +134,13 @@
 						}
 					}}
 				>
-					<img src="/copy.svg" class="w-6 h-6 inline-block" alt="Copy" />
+					<img src="/copy.svg" class="inline-block h-6 w-6" alt="Copy" />
 				</button>
 			</div>
 			<!-- Check if this is the last message in the conversation. Also check if it is from the bot -->
 			{#if msg === messages[messages.length - 1] && msg.name === 'ChatGPT'}
 				<!-- Regenerate icon -->
-				<div class="float-right text-gray-500 align-top inline-block w-6 h-6 filter invert">
+				<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
 					<button
 						on:click={() => {
 							if (thinking) return;
@@ -156,29 +158,29 @@
 							addMessage(lastMessage.name, lastMessage.message);
 						}}
 					>
-						<img src="/regen.svg" class="w-6 h-6 inline-block px-1" alt="Regenerate" />
+						<img src="/regen.svg" class="inline-block h-6 w-6 px-1" alt="Regenerate" />
 					</button>
 				</div>
 			{/if}
 		</div>
 	{:else}
 		<!-- Human -->
-		<div class="bg-blue-700 text-white rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
-			<img src="/default.svg" class="w-6 h-6 inline-block align-top mr-1" alt="OpenAI Logo" />
+		<div class="my-2 whitespace-pre-line rounded-lg bg-blue-700 p-2 text-white shadow-md">
+			<img src="/default.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			{msg.message}
 		</div>
 	{/if}
 {/each}
 {#if thinking}
-	<div class="bg-gray-700 text-gray-500 rounded-lg p-2 my-2 whitespace-pre-line shadow-md">
+	<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-gray-500 shadow-md">
 		<svg
-			class="animate-spin text-white inline-block h-5 w-5 align-middle mr-1"
+			class="mr-1 inline-block h-5 w-5 animate-spin align-middle text-white"
 			xmlns="http://www.w3.org/2000/svg"
 			fill="none"
 			viewBox="0 0 24 24"
 		>
 			<circle
-				class="opacity-25 inline-block"
+				class="inline-block opacity-25"
 				cx="12"
 				cy="12"
 				r="10"
@@ -186,7 +188,7 @@
 				stroke-width="4"
 			/>
 			<path
-				class="opacity-75 inline-block"
+				class="inline-block opacity-75"
 				fill="currentColor"
 				d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 			/>
@@ -212,7 +214,7 @@
 		}
 	}}
 	placeholder="Your message"
-	class="rounded-md p-2 w-full shadow-md"
+	class="w-full rounded-md p-2 shadow-md"
 	rows="3"
 	id="messageInput"
 />
@@ -226,7 +228,7 @@
 	{#if thinking}
 		<button
 			disabled
-			class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow"
+			class="flex-grow rounded-md bg-gray-500 p-2 text-gray-600 shadow-md"
 			id="sendButton"
 		>
 			Thinking...
@@ -234,7 +236,7 @@
 	{:else if cooldown}
 		<button
 			disabled
-			class="bg-gray-500 text-gray-600 rounded-md p-2 shadow-md flex-grow"
+			class="flex-grow rounded-md bg-gray-500 p-2 text-gray-600 shadow-md"
 			id="sendButton"
 		>
 			Cooldown... {cooldownTimer}s
@@ -251,7 +253,7 @@
 					input.focus();
 				}
 			}}
-			class="bg-blue-500 text-white rounded-md p-2 shadow-md flex-grow"
+			class="flex-grow rounded-md bg-blue-500 p-2 text-white shadow-md"
 			id="sendButton"
 		>
 			Reply
@@ -268,7 +270,7 @@
 				input.focus();
 			}
 		}}
-		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
+		class="rounded-md bg-blue-500 p-2 text-white shadow-md"
 	>
 		Reset
 	</button>
@@ -281,7 +283,7 @@
 				input.focus();
 			}
 		}}
-		class="bg-blue-500 text-white rounded-md p-2 shadow-md"
+		class="rounded-md bg-blue-500 p-2 text-white shadow-md"
 	>
 		<!-- On click get all of the messages and save them to a txt file -->
 		Save

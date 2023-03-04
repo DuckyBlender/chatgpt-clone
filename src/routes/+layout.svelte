@@ -4,7 +4,6 @@
 
 <div class="bg-gradient-to-l from-blue-900 to-red-900 min-h-screen -z-10">
 	<!-- Center the content -->
-	<!-- padding top 4 -->
 	<div class="flex justify-center items-center h-full p-4">
 		<!-- Set the width of the content -->
 		<div class="w-full">
