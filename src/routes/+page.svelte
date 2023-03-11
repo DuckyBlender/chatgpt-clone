@@ -107,11 +107,7 @@
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
-			<img
-				src="/openai.svg"
-				class="mr-1 inline-block h-6 w-6 align-top"
-				alt="OpenAI Logo"
-			/>
+			<img src="/openai.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			{msg.message}
 			<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
 				<!-- Copy icon -->
@@ -143,8 +139,7 @@
 				<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
 					<button
 						on:click={() => {
-							if (thinking) return;
-							if (cooldown) {
+							if (thinking || cooldown) {
 								shakeButton();
 								return;
 							}
@@ -259,6 +254,7 @@
 			Reply
 		</button>
 	{/if}
+
 	<button
 		on:click={() => {
 			messages = [];
@@ -272,6 +268,7 @@
 		}}
 		class="rounded-md bg-blue-500 p-2 text-white shadow-md"
 	>
+		<!-- Reset all of the history -->
 		Reset
 	</button>
 	<button
