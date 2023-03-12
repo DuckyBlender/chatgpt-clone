@@ -102,15 +102,44 @@
 	addMessage('ChatGPT', 'Ask me anything!');
 </script>
 
+<svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/dark.min.css"
+	/>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"
+	></script>
+</svelte:head>
+
 <!-- If the user is logged in, show the chat -->
 {#each messages as msg}
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
 			<img src="/openai.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
-			{msg.message}
+			<!-- Code block support -->
+			{#each msg.message.split('```') as code, i}
+				{#if i % 2 === 0}
+					<!-- Normal text -->
+					{code}
+				{:else}
+					<!-- Trim the response -->
+					<!-- Code block -->
+					<pre>
+						<code class="rounded-lg shadow-md">
+							<!-- TODO: Fix potential XSS attacks -->
+							{code.trim()}
+						</code>
+					</pre>
+					<script>
+						hljs.highlightAll();
+					</script>
+				{/if}
+			{/each}
+
+			<!-- Copy icon -->
 			<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
-				<!-- Copy icon -->
 				<!-- Id is the index of the message -->
 				<button
 					id={'copyButton' + messages.indexOf(msg)}
@@ -133,8 +162,8 @@
 					<img src="/copy.svg" class="inline-block h-6 w-6" alt="Copy" />
 				</button>
 			</div>
-			<!-- Check if this is the last message in the conversation. Also check if it is from the bot -->
-			{#if msg === messages[messages.length - 1] && msg.name === 'ChatGPT'}
+			<!-- Check if this is the last message in the conversation. -->
+			{#if msg === messages[messages.length - 1]}
 				<!-- Regenerate icon -->
 				<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
 					<button
