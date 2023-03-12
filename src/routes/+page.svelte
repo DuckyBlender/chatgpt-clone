@@ -99,7 +99,18 @@
 		cooldown = false;
 	}
 
-	addMessage('ChatGPT', 'Ask me anything!');
+	addMessage(
+		'ChatGPT',
+		`Sure, here's a simple Rust code that prints "Hello, world!" to the console:
+		
+\`\`\`
+fn main() {
+    println!("Hello, world!");
+}
+\`\`\`
+
+This program defines a main function that prints the string "Hello, world!" using the \`println!\` macro. When you run this program, you should see the message printed to the console.`
+	);
 </script>
 
 <svelte:head>
@@ -116,23 +127,24 @@
 {#each messages as msg}
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
+
 		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
 			<img src="/openai.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			<!-- Code block support -->
 			{#each msg.message.split('```') as code, i}
 				{#if i % 2 === 0}
 					<!-- Normal text -->
-					{code}
+					{code.trim()}
 				{:else}
-					<!-- Trim the response -->
 					<!-- Code block -->
 					<pre>
 						<code class="rounded-lg shadow-md">
-							<!-- TODO: Fix potential XSS attacks -->
-							{code.trim()}
+							{code}
 						</code>
 					</pre>
+
 					<script>
+						// Format the code block
 						hljs.highlightElement(
 							document.querySelectorAll('code')[document.querySelectorAll('code').length - 1]
 						);

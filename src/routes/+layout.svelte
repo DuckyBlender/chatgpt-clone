@@ -9,7 +9,6 @@
 		let res = await fetch('https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits');
 		let res_json = await res.json();
 		commitCount = `Commit ${res_json.length}`;
-		console.log(commitCount);
 		return commitCount;
 	}
 </script>
@@ -29,9 +28,7 @@
 				<p class="text-sm ">An advanced AI chatbot powered by GPT-3.5</p>
 			</div>
 			<div class="text-right">
-				<!-- Title -->
 				<h1 class="text-md mb-1 font-light">Website by DuckyBlender</h1>
-				<!-- Subtitle -->
 				<!-- To get the exact number of commits we need to use the GitHub API -->
 				<!-- https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits -->
 				<p class="text-sm font-light">{commitCount}</p>
