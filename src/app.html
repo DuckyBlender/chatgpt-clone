@@ -6,12 +6,9 @@
 		<meta name="viewport" content="width=device-width" />
 		%sveltekit.head%
 	</head>
-	<!-- Fix background -->
-	<!-- Hacky solution but it works -->
-	<body
-		data-sveltekit-preload-data="hover"
-		class="-z-10 min-h-screen bg-gradient-to-l from-blue-900 to-red-900"
-	>
-		<div style="display: contents">%sveltekit.body%</div>
+	<!-- Fix background when scrolling beyond the viewport -->
+	<!-- Mainly an issue on mobile -->
+	<body data-sveltekit-preload-data="hover" class="bg-gray-100 dark:bg-gray-900">
+		<div class="contents">%sveltekit.body%</div>
 	</body>
 </html>

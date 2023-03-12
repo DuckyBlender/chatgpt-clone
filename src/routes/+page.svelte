@@ -133,7 +133,9 @@
 						</code>
 					</pre>
 					<script>
-						hljs.highlightAll();
+						hljs.highlightElement(
+							document.querySelectorAll('code')[document.querySelectorAll('code').length - 1]
+						);
 					</script>
 				{/if}
 			{/each}
