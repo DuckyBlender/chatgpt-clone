@@ -1,14 +1,14 @@
 <script>
 	import '../app.css';
 	import { onMount } from 'svelte';
-	let commitCount = 0;
+	let commitCount = 'Loading...';
 	onMount(() => {
 		getCommitNumber();
 	});
 	async function getCommitNumber() {
 		let res = await fetch('https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits');
 		let res_json = await res.json();
-		commitCount = res_json.length;
+		commitCount = `Commit ${res_json.length}`;
 		console.log(commitCount);
 		return commitCount;
 	}
@@ -34,7 +34,7 @@
 				<!-- Subtitle -->
 				<!-- To get the exact number of commits we need to use the GitHub API -->
 				<!-- https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits -->
-				<p class="text-sm font-light">Commit {commitCount}</p>
+				<p class="text-sm font-light">{commitCount}</p>
 			</div>
 		</div>
 
