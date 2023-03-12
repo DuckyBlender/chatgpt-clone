@@ -240,7 +240,7 @@
 		}
 	}}
 	placeholder="Your message"
-	class="w-full rounded-md p-2 shadow-md"
+	class="w-full rounded-md p-2 text-slate-800 shadow-md"
 	rows="3"
 	id="messageInput"
 />
