@@ -87,6 +87,7 @@
 		}
 		thinking = false;
 		buttonCooldown(); // without async to not wait for it
+		console.log(messages);
 	}
 
 	// Async function to add a cooldown to the button
@@ -99,10 +100,7 @@
 		cooldown = false;
 	}
 
-	addMessage(
-		'ChatGPT',
-		`Ask me anything!`
-	);
+	addMessage('ChatGPT', `Ask me anything!`);
 </script>
 
 <svelte:head>
@@ -123,22 +121,34 @@
 		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
 			<img src="/openai.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			<!-- Code block support -->
-			{#each msg.message.split('```') as code, i}
+			{#each msg.message.split('```') as text, i}
 				{#if i % 2 === 0}
 					<!-- Normal text -->
-					{code.trim()}
+					<!-- Split by single backticks -->
+					{#each text.split('`') as code, i2}
+						{#if i2 % 2 === 0}
+							<!-- Normal text -->
+							{code}
+						{:else}
+							<!-- Code block -->
+							<span class="rounded-lg bg-gray-800 font-mono shadow-md">
+								{code.trim()}
+							</span>
+						{/if}
+					{/each}
 				{:else}
 					<!-- Code block -->
-					<pre>
-						<code class="rounded-lg shadow-md">
-							{code}
-						</code>
-					</pre>
+					<!-- Remove everything until the first newline -->
+					<!-- Todo -->
+
+					<div class="code text-mono whitespace-pre rounded-lg bg-gray-800 p-2 shadow-md">
+						{text.trim()}
+					</div>
 
 					<script>
 						// Format the code block
 						hljs.highlightElement(
-							document.querySelectorAll('code')[document.querySelectorAll('code').length - 1]
+							document.querySelectorAll('.code')[document.querySelectorAll('.code').length - 1]
 						);
 					</script>
 				{/if}
