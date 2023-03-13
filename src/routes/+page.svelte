@@ -101,15 +101,7 @@
 
 	addMessage(
 		'ChatGPT',
-		`Sure, here's a simple Rust code that prints "Hello, world!" to the console:
-		
-\`\`\`
-fn main() {
-    println!("Hello, world!");
-}
-\`\`\`
-
-This program defines a main function that prints the string "Hello, world!" using the \`println!\` macro. When you run this program, you should see the message printed to the console.`
+		`Ask me anything!`
 	);
 </script>
 
