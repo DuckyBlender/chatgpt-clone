@@ -6,7 +6,9 @@
 		getCommitNumber();
 	});
 	async function getCommitNumber() {
-		let res = await fetch('https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits');
+		let res = await fetch(
+			'https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits?per_page=1000'
+		);
 		let res_json = await res.json();
 		commitCount = `Commit ${res_json.length}`;
 		return commitCount;
