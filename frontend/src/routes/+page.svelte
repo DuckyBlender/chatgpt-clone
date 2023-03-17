@@ -66,11 +66,9 @@
 		};
 
 		thinking = true;
-		let res = await fetch('https://api.openai.com/v1/chat/completions', {
+		let res = await fetch('https://gptapi.ducky.pics', {
 			method: 'POST',
 			headers: {
-				// to hide this from the public, I have added this to the .env file
-				Authorization: 'Bearer ' + import.meta.env.VITE_OPENAI_API_KEY,
 				// to set this up in svelte using vite
 				'Content-Type': 'application/json'
 			},

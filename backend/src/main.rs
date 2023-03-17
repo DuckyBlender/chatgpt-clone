@@ -59,7 +59,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new().wrap(cors).service(chatgpt_clone)
     })
-    .bind("0.0.0.0:8000")?
+    .bind("0.0.0.0:8456")?
     .run()
     .await
 }
