@@ -16,9 +16,21 @@
 	let cooldown = false;
 
 	let isMobile = false;
+	let textarea: HTMLTextAreaElement | null = null;
+
+	async function autoResize() {
+		if (textarea === null) return;
+		textarea.style.height = 'auto';
+		textarea.style.height = textarea.scrollHeight + 'px';
+	}
 
 	// Focus the textarea
 	onMount(() => {
+		// Define the textarea
+		textarea = document.getElementById('messageInput') as HTMLTextAreaElement;
+		// Set it to 64px
+		textarea.style.height = '64px';
+
 		// Check if the user is on mobile
 		isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -233,9 +245,9 @@
 			message += '\n';
 		}
 	}}
+	on:input={autoResize}
 	placeholder="Your message"
-	class=" w-full rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
-	rows="3"
+	class=" w-full overflow-hidden rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
 	id="messageInput"
 />
 

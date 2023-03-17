@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+
 	let commitCount = 'Loading...';
 	onMount(() => {
 		getCommitNumber();
@@ -27,6 +28,7 @@
 				<!-- Title -->
 				<h1 class="text-2xl font-bold">ChatGPT</h1>
 				<!-- Subtitle -->
+
 				<p class="text-sm ">An advanced AI chatbot powered by GPT-3.5</p>
 			</div>
 			<div class="text-right">
