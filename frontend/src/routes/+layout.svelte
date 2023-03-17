@@ -16,6 +16,20 @@
 	}
 </script>
 
+<svelte:head>
+	<!-- Meta tags for discord embed -->
+	<meta property="og:title" content="ChatGPT" />
+	<meta
+		property="og:description"
+		content="An advanced AI chatbot powered by GPT-3.5, website made by DuckyBlender"
+	/>
+	<meta property="og:image" content="https://duckys3.s3.eu-central-1.amazonaws.com/embed.png" />
+	<meta property="og:url" content="https://chatgpt.ducky.pics" />
+	<meta property="og:site_name" content="ChatGPT" />
+	<meta property="og:type" content="website" />
+	<meta property="og:locale" content="en_US" />
+</svelte:head>
+
 <!-- Center the content -->
 <div class="flex h-full items-center justify-center p-4">
 	<!-- Set the width of the content -->
