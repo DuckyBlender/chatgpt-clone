@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import CopyButton from '../components/CopyButton.svelte';
+	import RegenerateButton from '../components/RegenerateButton.svelte';
+	import ThinkingIndicator from '../components/ThinkingIndicator.svelte';
 
 	let username = 'Human';
 
@@ -155,52 +158,11 @@
 			{/each}
 
 			<!-- Copy icon -->
-			<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
-				<!-- Id is the index of the message -->
-				<button
-					id={'copyButton' + messages.indexOf(msg)}
-					on:click={() => {
-						navigator.clipboard.writeText(msg.message);
-						// Change the icon to a checkmark for 1 second
-						// we can't use the id because it is not unique
-						// so let's use the index of the message
-						let button = document.getElementById('copyButton' + messages.indexOf(msg));
-						if (button !== null) {
-							button.innerHTML = '<img src="/tick.svg" class="w-6 h-6 inline-block" alt="Check" />';
-							setTimeout(() => {
-								if (button !== null)
-									button.innerHTML =
-										'<img src="/copy.svg" class="w-6 h-6 inline-block" alt="Copy" />';
-							}, 1000);
-						}
-					}}
-				>
-					<img src="/copy.svg" class="inline-block h-6 w-6" alt="Copy" />
-				</button>
-			</div>
+			<CopyButton {msg} {messages} />
 			<!-- Check if this is the last message in the conversation. -->
 			{#if msg === messages[messages.length - 1]}
 				<!-- Regenerate icon -->
-				<div class="float-right inline-block h-6 w-6 align-top text-gray-500 invert filter">
-					<button
-						on:click={() => {
-							if (thinking || cooldown) {
-								shakeButton();
-								return;
-							}
-							// save the last human message
-							let lastMessage = messages[messages.length - 2];
-							// remove the last bot message
-							messages.pop();
-							// remove the last message with the user message
-							messages.pop();
-							// add a new message to generate a new response
-							addMessage(lastMessage.name, lastMessage.message);
-						}}
-					>
-						<img src="/regen.svg" class="inline-block h-6 w-6 px-1" alt="Regenerate" />
-					</button>
-				</div>
+				<RegenerateButton {messages} {thinking} {cooldown} {shakeButton} {addMessage} />
 			{/if}
 		</div>
 	{:else}
@@ -214,30 +176,7 @@
 	{/if}
 {/each}
 {#if thinking}
-	<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-gray-500 shadow-md">
-		<svg
-			class="mr-1 inline-block h-5 w-5 animate-spin align-middle text-white"
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-		>
-			<circle
-				class="inline-block opacity-25"
-				cx="12"
-				cy="12"
-				r="10"
-				stroke="currentColor"
-				stroke-width="4"
-			/>
-			<path
-				class="inline-block opacity-75"
-				fill="currentColor"
-				d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-			/>
-		</svg>
-		<!-- Got this SVG code from the tailwind website -->
-		<span class="animate-pulse">Thinking...</span>
-	</div>
+	<ThinkingIndicator />
 {/if}
 <!-- To fix shift+enter functionality in the above input, we need to use a textarea -->
 <textarea
