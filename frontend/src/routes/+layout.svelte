@@ -45,7 +45,7 @@
 
 		<!-- Main content -->
 		<div
-			class="overflow-y-auto rounded-lg bg-gradient-to-bl from-slate-100 to-slate-200  p-4  text-slate-900 shadow-md dark:from-slate-700 dark:to-slate-600 dark:text-slate-100"
+			class="overflow-y-auto rounded-lg bg-gradient-to-bl from-slate-100 to-slate-200 p-4 text-slate-900 shadow-md dark:from-slate-700 dark:to-slate-600 dark:text-slate-100"
 		>
 			<!-- Set the content -->
 			<slot />

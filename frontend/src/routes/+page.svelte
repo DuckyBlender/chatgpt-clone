@@ -5,6 +5,7 @@
 	import ThinkingIndicator from '../components/ThinkingIndicator.svelte';
 
 	let username = 'Human';
+	let super_secret_mode = false;
 
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
@@ -14,8 +15,13 @@
 	let cooldownTimer = 0;
 	let cooldown = false;
 
-	// Focus the textview
+	let isMobile = false;
+
+	// Focus the textarea
 	onMount(() => {
+		// Check if the user is on mobile
+		isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 		let input = document.getElementById('messageInput');
 		if (input !== null) {
 			input.focus();
@@ -67,6 +73,10 @@
 				};
 			})
 		};
+		// if super secret mode is enabled, change the model to GPT-4
+		if (super_secret_mode) {
+			requestBody.model = 'gpt-4';
+		}
 
 		thinking = true;
 		let res = await fetch('https://gptapi.ducky.pics', {
@@ -89,6 +99,9 @@
 		thinking = false;
 		buttonCooldown(); // without async to not wait for it
 		console.log(messages);
+		if (super_secret_mode) {
+			console.log(res);
+		}
 	}
 
 	// Async function to add a cooldown to the button
@@ -101,8 +114,29 @@
 		cooldown = false;
 	}
 
+	async function handleKeydown(event: KeyboardEvent) {
+		// If the user presses the "." key, toggle the super secret mode which changes the model to GPT-4
+		if (event.key === '.') {
+			// Check if the user is in the textarea
+			let input = document.getElementById('messageInput');
+			if (input !== null) {
+				if (document.activeElement === input) {
+					return;
+				}
+			}
+			super_secret_mode = !super_secret_mode;
+			if (super_secret_mode) {
+				window.alert('Super secret mode enabled!');
+			} else {
+				window.alert('Super secret mode disabled!');
+			}
+		}
+	}
+
 	addMessage('ChatGPT', `Ask me anything!`);
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <svelte:head>
 	<link
@@ -193,6 +227,11 @@
 			addMessage(username, message);
 			message = '';
 		}
+		// To fix making a newline on mobile, we need to check if the user is on mobile
+		if (e.key === 'Enter' && e.shiftKey && isMobile) {
+			e.preventDefault();
+			message += '\n';
+		}
 	}}
 	placeholder="Your message"
 	class=" w-full rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
@@ -246,7 +285,7 @@
 			messages = [];
 			addMessage('ChatGPT', 'Ask me anything!');
 			message = '';
-			// Also reset the textview
+			// Also reset the textarea
 			let input = document.getElementById('messageInput');
 			if (input !== null) {
 				input.focus();
@@ -260,7 +299,7 @@
 	<button
 		on:click={() => {
 			saveMessages();
-			// Also reset the textview
+			// Also reset the textarea
 			let input = document.getElementById('messageInput');
 			if (input !== null) {
 				input.focus();
