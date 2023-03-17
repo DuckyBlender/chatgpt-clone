@@ -238,7 +238,7 @@
 <textarea
 	bind:value={message}
 	on:keydown={(e) => {
-		if (e.key === 'Enter' && !e.shiftKey) {
+		if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
 			if (cooldown || thinking) {
 				e.preventDefault();
 				shakeButton();
@@ -252,9 +252,10 @@
 			if (textarea !== null) textarea.style.height = '64px';
 		}
 		// To fix making a newline on mobile, we need to check if the user is on mobile
-		if (e.key === 'Enter' && e.shiftKey && isMobile) {
+		if (e.key === 'Enter' && isMobile) {
 			e.preventDefault();
 			message += '\n';
+			autoResize(); // because we prevent default behavior, we need to manually call this
 		}
 	}}
 	on:input={autoResize}
@@ -291,6 +292,8 @@
 				if (input !== null) {
 					input.focus();
 				}
+				// set the textarea to 64px (the default height)
+				if (textarea !== null) textarea.style.height = '64px';
 			}}
 			class="flex-grow rounded-md bg-blue-500 p-2 text-white shadow-md"
 			id="sendButton"
