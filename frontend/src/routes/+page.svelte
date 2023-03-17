@@ -102,11 +102,21 @@
 		});
 		// get the response from the server
 		if (res.ok) {
-			let response = (await res.json()).choices[0].message.content;
+			let response_json = await res.json();
+			// check if this contains an "error" field
+			if (response_json.error) {
+				// if it does, add an error message
+				addMessage('ChatGPT', 'Something went wrong, please try again later.');
+				console.error(res);
+				return;
+			}
+			// if it doesn't, add the response
+			let response = response_json.choices[0].message.content;
 			addMessage('ChatGPT', response);
 		} else {
 			addMessage('ChatGPT', 'Something went wrong, please try again later.');
 			console.error(res);
+			thinking = false;
 		}
 		thinking = false;
 		buttonCooldown(); // without async to not wait for it
@@ -238,6 +248,8 @@
 			e.preventDefault();
 			addMessage(username, message);
 			message = '';
+			// set the textarea to 64px (the default height)
+			if (textarea !== null) textarea.style.height = '64px';
 		}
 		// To fix making a newline on mobile, we need to check if the user is on mobile
 		if (e.key === 'Enter' && e.shiftKey && isMobile) {
@@ -247,14 +259,9 @@
 	}}
 	on:input={autoResize}
 	placeholder="Your message"
-	class=" w-full overflow-hidden rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
+	class=" w-full resize-none overflow-hidden rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
 	id="messageInput"
 />
-
-<!-- Small reminder that the user can adjust the height by dragging it -->
-<p class="text-xs text-gray-500">
-	You can adjust the height of the input box by dragging the bottom of it
-</p>
 
 <div class="flex flex-row space-x-2">
 	{#if thinking}
