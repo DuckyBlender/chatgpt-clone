@@ -33,7 +33,13 @@
 				<h1 class="text-md mb-1 font-light">Website by DuckyBlender</h1>
 				<!-- To get the exact number of commits we need to use the GitHub API -->
 				<!-- https://api.github.com/repos/DuckyBlender/chatgpt-clone/commits -->
-				<p class="text-sm font-light">{commitCount}</p>
+				<p class="text-sm font-light">
+					<a href="https://github.com/DuckyBlender/chatgpt-clone" class="text-blue-400">
+						{commitCount}
+					</a>
+					|
+					<a href="/changelog" class="text-blue-400">Changelog</a>
+				</p>
 			</div>
 		</div>
 
