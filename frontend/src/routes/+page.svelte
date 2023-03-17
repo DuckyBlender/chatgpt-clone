@@ -56,17 +56,26 @@
 		messages.forEach((msg) => {
 			text += msg.name + ': ' + msg.message + '\n';
 		});
+
+		// Create a Blob with the text content
+		let blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+
+		// Create a URL to represent the Blob
+		let url = URL.createObjectURL(blob);
+
 		let element = document.createElement('a');
-		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+		element.setAttribute('href', url);
 		element.setAttribute('download', 'chat.txt');
 
 		element.style.display = 'none';
 		document.body.appendChild(element);
 
+		// Trigger the click event to start the download
 		element.click();
 
+		// Remove the link from the document and revoke the URL to free up memory
 		document.body.removeChild(element);
-		// I have actually no idea how this works, copilot did it for me lolol
+		URL.revokeObjectURL(url);
 	}
 
 	// add messages to the array
