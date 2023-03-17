@@ -118,7 +118,9 @@
 	{#if msg.name === 'ChatGPT'}
 		<!-- ChatGPT -->
 
-		<div class="my-2 whitespace-pre-line rounded-lg bg-gray-700 p-2 text-white shadow-md">
+		<div
+			class="my-2 whitespace-pre-line rounded-lg border-2 border-gray-600 bg-gray-700 p-2 text-white shadow-md"
+		>
 			<img src="/openai.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			<!-- Code block support -->
 			{#each msg.message.split('```') as text, i}
@@ -205,7 +207,9 @@
 		</div>
 	{:else}
 		<!-- Human -->
-		<div class="my-2 whitespace-pre-line rounded-lg bg-blue-700 p-2 text-white shadow-md">
+		<div
+			class="my-2 whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md"
+		>
 			<img src="/default.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			{msg.message}
 		</div>
@@ -254,7 +258,7 @@
 		}
 	}}
 	placeholder="Your message"
-	class="w-full rounded-md p-2 text-slate-800 shadow-md"
+	class=" w-full rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
 	rows="3"
 	id="messageInput"
 />
