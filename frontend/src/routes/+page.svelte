@@ -15,6 +15,8 @@
 	let cooldownTimer = 0;
 	let cooldown = false;
 
+	let totalCost = 0;
+
 	let isMobile = false;
 	let textarea: HTMLTextAreaElement | null = null;
 
@@ -121,6 +123,12 @@
 			// if it doesn't, add the response
 			let response = response_json.choices[0].message.content;
 			addMessage('assistant', response, false);
+			// update the cost counter
+			let promptTokens = response_json.usage.prompt_tokens;
+			let completionTokens = response_json.usage.completion_tokens;
+			// calculate the cost (prompt is 0.03 per 1k, completion is 0.06 per 1k)
+			let cost = (promptTokens / 1000) * 0.03 + (completionTokens / 1000) * 0.06;
+			totalCost += cost;
 		} else {
 			addMessage('system', 'Something went wrong, please try again later.', false);
 			console.error(res);
@@ -189,7 +197,7 @@
 					<!-- Todo -->
 
 					<div
-						class="code text-mono whitespace-pre rounded-lg bg-gray-800 p-2 shadow-md overflow-auto"
+						class="code text-mono overflow-auto whitespace-pre rounded-lg bg-gray-800 p-2 shadow-md"
 					>
 						{text.trim()}
 					</div>
@@ -214,7 +222,7 @@
 	{:else if msg.name === 'user'}
 		<!-- Human -->
 		<div
-			class="my-2 whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md overflow-auto"
+			class="my-2 overflow-auto whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md"
 		>
 			<img src="/default.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			{msg.message}
@@ -263,6 +271,10 @@
 	class=" w-full resize-none overflow-hidden rounded-md border-2 border-gray-300 bg-gray-100 p-2 shadow-md focus:border-blue-600 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
 	id="messageInput"
 />
+<!-- Small text to show total cost -->
+<div class="text-xs text-gray-500 dark:text-gray-400">
+	Total cost: ${totalCost.toFixed(2)}
+</div>
 
 <div class="flex flex-row space-x-2">
 	{#if thinking}
