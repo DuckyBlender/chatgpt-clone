@@ -86,9 +86,9 @@ async fn main() -> std::io::Result<()> {
             .allow_any_header();
 
         App::new()
-            .wrap(cors)
             .service(chatgpt_clone)
             .wrap(rate_limit)
+            .wrap(cors)
     })
     .bind("0.0.0.0:8456")?
     .run()
