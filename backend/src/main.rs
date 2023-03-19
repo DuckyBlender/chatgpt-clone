@@ -5,8 +5,6 @@ use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 use std::env;
 
-mod check_key;
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Message {
     content: String,
