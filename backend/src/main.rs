@@ -5,20 +5,34 @@ use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 use std::env;
 
-#[derive(Serialize, Deserialize, Debug)]
+mod check_key;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct Message {
     content: String,
     role: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct ChatInput {
+    model: String,
+    messages: Vec<Message>,
+    key: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
-struct ChatRequest {
+struct ChatOutput {
     model: String,
     messages: Vec<Message>,
 }
 
 #[post("/")]
-async fn chatgpt_clone(chat_request: web::Json<ChatRequest>) -> impl Responder {
+async fn chatgpt_clone(chat_input: web::Json<ChatInput>) -> impl Responder {
+    // Check if the key is valid
+    if !check_key::validate_key(&chat_input.key) {
+        return HttpResponse::Unauthorized().finish();
+    }
+
     let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
     let client = reqwest::Client::new();
     let mut headers = HeaderMap::new();
@@ -28,7 +42,13 @@ async fn chatgpt_clone(chat_request: web::Json<ChatRequest>) -> impl Responder {
     );
     headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
 
-    let json = serde_json::to_string(&*chat_request).unwrap();
+    // Remove the key from the request
+    let chat_output = ChatOutput {
+        model: chat_input.model.clone(),
+        messages: chat_input.messages.clone(),
+    };
+
+    let json = serde_json::to_string(&chat_output).unwrap();
     let response = client
         .post("https://api.openai.com/v1/chat/completions")
         .headers(headers)

@@ -4,6 +4,8 @@
 	import RegenerateButton from '../components/RegenerateButton.svelte';
 	import ThinkingIndicator from '../components/ThinkingIndicator.svelte';
 
+	import { generateKey } from './generate_key.js';
+
 	// const SYSTEM_PREFIX = `You are a tutor that always responds in the Socratic style. You *never* give the student the answer, but always try to ask just the right question to help them learn to think for themselves. You should always tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.`;
 	const SYSTEM_PREFIX = ``;
 
@@ -86,13 +88,16 @@
 			return;
 		}
 		thinking = true;
+		// generate the key
+		let key = generateKey();
 		// send the message to the server
 		let requestBody = {
 			model: 'gpt-4',
 			messages: messages.map((msg) => {
 				return {
 					role: msg.name,
-					content: msg.message
+					content: msg.message,
+					key: key
 				};
 			})
 		};

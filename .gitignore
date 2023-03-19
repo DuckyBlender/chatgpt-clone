@@ -9,6 +9,7 @@ frontend/!.env.example
 frontend/vite.config.js.timestamp-*
 frontend/vite.config.ts.timestamp-*
 frontend/package-lock.json
+frontend/src/routes/generate_key.js
 
 backend/debug/
 backend/target/
@@ -16,3 +17,4 @@ backend/Cargo.lock
 backend/**/*.rs.bk
 backend/*.pdb
 backend/.env
+backend/src/check_key.rs
