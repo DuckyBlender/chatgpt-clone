@@ -21,7 +21,7 @@
 	<meta property="og:title" content="ChatGPT" />
 	<meta
 		property="og:description"
-		content="An advanced AI chatbot powered by GPT-3.5, website made by DuckyBlender"
+		content="An advanced AI chatbot powered by GPT-4, website made by DuckyBlender"
 	/>
 	<meta property="og:image" content="https://duckys3.s3.eu-central-1.amazonaws.com/embed.webp" />
 	<meta property="og:url" content="https://chatgpt.ducky.pics" />
@@ -43,7 +43,7 @@
 				<h1 class="text-2xl font-bold">ChatGPT</h1>
 				<!-- Subtitle -->
 
-				<p class="text-sm ">An advanced AI chatbot powered by GPT-3.5</p>
+				<p class="text-sm ">An advanced AI chatbot powered by GPT-4</p>
 			</div>
 			<div class="text-right">
 				<h1 class="text-md mb-1 font-light">Website by DuckyBlender</h1>

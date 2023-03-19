@@ -4,8 +4,8 @@
 	import RegenerateButton from '../components/RegenerateButton.svelte';
 	import ThinkingIndicator from '../components/ThinkingIndicator.svelte';
 
-	let username = 'Human';
-	let super_secret_mode = false;
+	// const SYSTEM_PREFIX = `You are a tutor that always responds in the Socratic style. You *never* give the student the answer, but always try to ask just the right question to help them learn to think for themselves. You should always tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.`;
+	const SYSTEM_PREFIX = ``;
 
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
@@ -79,25 +79,23 @@
 	}
 
 	// add messages to the array
-	async function addMessage(name: string, message: string) {
+	async function addMessage(name: string, message: string, respond: boolean) {
 		message = message.trim();
 		messages = [...messages, { name, message }];
-		if (name === 'ChatGPT') return;
+		if (!respond) {
+			return;
+		}
 		thinking = true;
 		// send the message to the server
 		let requestBody = {
-			model: 'gpt-3.5-turbo',
+			model: 'gpt-4',
 			messages: messages.map((msg) => {
 				return {
-					role: msg.name === 'ChatGPT' ? 'assistant' : 'user',
+					role: msg.name,
 					content: msg.message
 				};
 			})
 		};
-		// if super secret mode is enabled, change the model to GPT-4
-		if (super_secret_mode) {
-			requestBody.model = 'gpt-4';
-		}
 
 		thinking = true;
 		let res = await fetch('https://gptapi.ducky.pics', {
@@ -115,24 +113,22 @@
 			// check if this contains an "error" field
 			if (response_json.error) {
 				// if it does, add an error message
-				addMessage('ChatGPT', 'Something went wrong, please try again later.');
+				addMessage('system', 'Something went wrong, please try again later.', false);
 				console.error(res);
 				return;
 			}
 			// if it doesn't, add the response
 			let response = response_json.choices[0].message.content;
-			addMessage('ChatGPT', response);
+			addMessage('assistant', response, false);
 		} else {
-			addMessage('ChatGPT', 'Something went wrong, please try again later.');
+			addMessage('system', 'Something went wrong, please try again later.', false);
 			console.error(res);
 			thinking = false;
+			return;
 		}
 		thinking = false;
 		buttonCooldown(); // without async to not wait for it
 		console.log(messages);
-		if (super_secret_mode) {
-			console.log(res);
-		}
 	}
 
 	// Async function to add a cooldown to the button
@@ -145,29 +141,12 @@
 		cooldown = false;
 	}
 
-	async function handleKeydown(event: KeyboardEvent) {
-		// If the user presses the "." key, toggle the super secret mode which changes the model to GPT-4
-		if (event.key === '.') {
-			// Check if the user is in the textarea
-			let input = document.getElementById('messageInput');
-			if (input !== null) {
-				if (document.activeElement === input) {
-					return;
-				}
-			}
-			super_secret_mode = !super_secret_mode;
-			if (super_secret_mode) {
-				window.alert('Super secret mode enabled!');
-			} else {
-				window.alert('Super secret mode disabled!');
-			}
-		}
+	if (SYSTEM_PREFIX !== ``) {
+		// If the prefix is not empty, add a message to the chat
+		addMessage('system', SYSTEM_PREFIX, false);
 	}
-
-	addMessage('ChatGPT', `Ask me anything!`);
+	// Get the bot to say something
 </script>
-
-<svelte:window on:keydown={handleKeydown} />
 
 <svelte:head>
 	<link
@@ -181,9 +160,8 @@
 
 <!-- If the user is logged in, show the chat -->
 {#each messages as msg}
-	{#if msg.name === 'ChatGPT'}
+	{#if msg.name === 'assistant'}
 		<!-- ChatGPT -->
-
 		<div
 			class="my-2 whitespace-pre-line rounded-lg border-2 border-gray-600 bg-gray-700 p-2 text-white shadow-md"
 		>
@@ -230,12 +208,20 @@
 				<RegenerateButton {messages} {thinking} {cooldown} {shakeButton} {addMessage} />
 			{/if}
 		</div>
-	{:else}
+	{:else if msg.name === 'user'}
 		<!-- Human -->
 		<div
 			class="my-2 whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md"
 		>
 			<img src="/default.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
+			{msg.message}
+		</div>
+	{:else if msg.name === 'system'}
+		<!-- System -->
+		<div
+			class="my-2 whitespace-pre-line rounded-lg border-2 border-gray-800 bg-gray-900 p-2 text-slate-400 shadow-md"
+		>
+			<img src="/system.svg" class=" mr-1 inline-block h-6 w-6 align-top" alt="System Logo" />
 			{msg.message}
 		</div>
 	{/if}
@@ -255,7 +241,7 @@
 			}
 			if (message.trim() === '') return;
 			e.preventDefault();
-			addMessage(username, message);
+			addMessage('user', message, true);
 			message = '';
 			// set the textarea to 64px (the default height)
 			if (textarea !== null) textarea.style.height = '64px';
@@ -294,7 +280,7 @@
 		<button
 			on:click={() => {
 				if (message.trim() === '') return;
-				addMessage(username, message);
+				addMessage('user', message, true);
 				message = '';
 				// refocus the input
 				let input = document.getElementById('messageInput');
@@ -314,7 +300,9 @@
 	<button
 		on:click={() => {
 			messages = [];
-			addMessage('ChatGPT', 'Ask me anything!');
+			if (SYSTEM_PREFIX !== ``) {
+				addMessage('system', SYSTEM_PREFIX, false);
+			}
 			message = '';
 			// Also reset the textarea
 			let input = document.getElementById('messageInput');
