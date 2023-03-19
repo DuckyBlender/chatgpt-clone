@@ -114,6 +114,7 @@
 			if (response_json.error) {
 				// if it does, add an error message
 				addMessage('system', 'Something went wrong, please try again later.', false);
+				thinking = false;
 				console.error(res);
 				return;
 			}
@@ -187,7 +188,9 @@
 					<!-- Remove everything until the first newline -->
 					<!-- Todo -->
 
-					<div class="code text-mono whitespace-pre rounded-lg bg-gray-800 p-2 shadow-md">
+					<div
+						class="code text-mono whitespace-pre rounded-lg bg-gray-800 p-2 shadow-md overflow-auto"
+					>
 						{text.trim()}
 					</div>
 
@@ -211,7 +214,7 @@
 	{:else if msg.name === 'user'}
 		<!-- Human -->
 		<div
-			class="my-2 whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md"
+			class="my-2 whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md overflow-auto"
 		>
 			<img src="/default.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			{msg.message}
@@ -223,6 +226,8 @@
 		>
 			<img src="/system.svg" class=" mr-1 inline-block h-6 w-6 align-top" alt="System Logo" />
 			{msg.message}
+			<!-- Copy icon -->
+			<CopyButton {msg} {messages} />
 		</div>
 	{/if}
 {/each}
