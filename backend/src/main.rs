@@ -17,7 +17,6 @@ struct Message {
 struct ChatInput {
     model: String,
     messages: Vec<Message>,
-    key: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -29,10 +28,6 @@ struct ChatOutput {
 #[post("/")]
 async fn chatgpt_clone(chat_input: web::Json<ChatInput>) -> impl Responder {
     // Check if the key is valid
-    if !check_key::validate_key(&chat_input.key) {
-        return HttpResponse::Unauthorized().finish();
-    }
-
     let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
     let client = reqwest::Client::new();
     let mut headers = HeaderMap::new();
