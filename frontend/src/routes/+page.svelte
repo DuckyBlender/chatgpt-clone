@@ -10,7 +10,7 @@
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
 	var thinking = false;
-	const timeout = 3;
+	const timeout = 5;
 
 	let cooldownTimer = 0;
 	let cooldown = false;

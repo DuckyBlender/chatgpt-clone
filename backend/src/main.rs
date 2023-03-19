@@ -1,9 +1,13 @@
 use actix_cors::Cors;
+use actix_extensible_rate_limit::{
+    backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
+    RateLimiter,
+};
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
-use std::env;
+use std::{env, time::Duration};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Message {
@@ -64,13 +68,27 @@ async fn chatgpt_clone(chat_input: web::Json<ChatInput>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
-    HttpServer::new(|| {
+    // A database for storing requests for rate limiting
+    let backend = InMemoryBackend::builder().build();
+
+    HttpServer::new(move || {
+        // Assign a limit of 5 requests per minute per client ip address
+        let input = SimpleInputFunctionBuilder::new(Duration::from_secs(5), 1)
+            .real_ip_key()
+            .build();
+        let rate_limit = RateLimiter::builder(backend.clone(), input)
+            .add_headers()
+            .build();
+
         let cors = Cors::default()
             .allow_any_origin()
             .allow_any_method()
             .allow_any_header();
 
-        App::new().wrap(cors).service(chatgpt_clone)
+        App::new()
+            .wrap(cors)
+            .service(chatgpt_clone)
+            .wrap(rate_limit)
     })
     .bind("0.0.0.0:8456")?
     .run()
