@@ -52,7 +52,7 @@
 		window.location.href = '/chat';
 	}
 
-	async function checkPassword() {
+	function checkPassword() {
 		// If the username and password are not empty, enable the submit button
 		if (username && password) {
 			(document.getElementById('submitPassword') as HTMLButtonElement).disabled = false;
@@ -61,7 +61,7 @@
 		}
 	}
 
-	async function checkToken() {
+	function checkToken() {
 		// The token must be an openai token
 		// Here is the regex to check if the token is valid
 		let regex = /^sk-[a-zA-Z0-9]{48}$/;
@@ -101,8 +101,8 @@
 			id="username"
 			class="bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Username"
-			on:keydown={checkPassword}
 			bind:value={username}
+			on:input={checkPassword}
 			required
 		/>
 		<label for="password">Password</label>
@@ -112,8 +112,8 @@
 			id="password"
 			class="bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Password"
-			on:keydown={checkPassword}
 			bind:value={password}
+			on:input={checkPassword}
 			required
 		/>
 		<button
@@ -141,8 +141,8 @@
 			id="token"
 			class="bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Token"
-			on:keydown={checkToken}
 			bind:value={token}
+			on:input={checkToken}
 			required
 		/>
 		<!-- Submit -->
