@@ -101,7 +101,7 @@
 			id="username"
 			class="bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Username"
-			on:change={checkPassword}
+			on:keydown={checkPassword}
 			bind:value={username}
 			required
 		/>
@@ -112,7 +112,7 @@
 			id="password"
 			class="bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Password"
-			on:change={checkPassword}
+			on:keydown={checkPassword}
 			bind:value={password}
 			required
 		/>
@@ -141,7 +141,7 @@
 			id="token"
 			class="bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Token"
-			on:change={checkToken}
+			on:keydown={checkToken}
 			bind:value={token}
 			required
 		/>
