@@ -1,11 +1,14 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
-	import costCounter from './+page.svelte';
+	import costCounter from './chat/+page.svelte';
 
 	let commitCount = 'Loading...';
 	onMount(() => {
+		// If the page is not found, redirect to the home page
+
 		getCommitNumber();
 	});
 	async function getCommitNumber() {
