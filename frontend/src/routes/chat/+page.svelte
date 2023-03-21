@@ -148,7 +148,7 @@
 				// If the model doesn't exist, change the model to gpt-3.5-turbo
 				MODEL = 'gpt-3.5-turbo';
 				addMessage('system', 'You do not have access to gpt-4, using gpt-3.5 instead.', false);
-				// Disable the GPT-4 selection
+				// Disable the GPT-4 input
 				let model_selection = document.getElementById('model') as HTMLInputElement;
 				model_selection.disabled = true;
 
@@ -207,7 +207,8 @@
 		bind:value={MODEL}
 	>
 		<option value="gpt-3.5-turbo" selected>GPT-3 (10x cheaper)</option>
-		<option value="gpt-4">GPT-4</option>
+		<option value="gpt-4">GPT-4 (more advanced)</option>
+		<option value="gpt-4-32k">GPT-4 (50 page context)</option>
 	</select>
 </div>
 
