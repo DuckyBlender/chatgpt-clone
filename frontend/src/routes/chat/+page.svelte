@@ -10,7 +10,7 @@
 	let message = '';
 	let messages: { name: string; message: string }[] = [];
 	var thinking = false;
-	const timeout = 5;
+	const timeout = 0;
 
 	let cooldownTimer = 0;
 	let cooldown = false;
@@ -21,6 +21,7 @@
 	let textarea: HTMLTextAreaElement | null = null;
 
 	let API_KEY = '';
+	let MODEL = 'gpt-3.5-turbo';
 
 	async function autoResize() {
 		if (textarea === null) return;
@@ -101,7 +102,7 @@
 		thinking = true;
 		// send the message to the server
 		let requestBody = {
-			model: 'gpt-4',
+			model: MODEL,
 			messages: messages.map((msg) => {
 				return {
 					role: msg.name,
@@ -140,6 +141,22 @@
 			// calculate the cost (prompt is 0.03 per 1k, completion is 0.06 per 1k)
 			let cost = (promptTokens / 1000) * 0.03 + (completionTokens / 1000) * 0.06;
 			totalCost += cost;
+		} else if (res.status === 404) {
+			// If the response is 404, maybe the user doesnt have access to gpt-4
+			let response_json = await res.json();
+			if (response_json.error.message === 'The model: `gpt-4` does not exist.') {
+				// If the model doesn't exist, change the model to gpt-3.5-turbo
+				MODEL = 'gpt-3.5-turbo';
+				addMessage('system', 'You do not have access to gpt-4, using gpt-3.5 instead.', false);
+				// Disable the GPT-4 selection
+				let model_selection = document.getElementById('model') as HTMLInputElement;
+				model_selection.disabled = true;
+
+				addMessage('system', 'Please wait...', false);
+				// Try again
+				addMessage(name, message, respond);
+				return;
+			}
 		} else {
 			addMessage('system', 'Something went wrong, please try again later.', false);
 			console.error(res);
@@ -179,6 +196,21 @@
 </svelte:head>
 
 <!-- If the user is logged in, show the chat -->
+
+<!-- ChatGPT model selection -->
+<label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
+<div class="mb-2">
+	<select
+		id="model"
+		name="model"
+		class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+		bind:value={MODEL}
+	>
+		<option value="gpt-3.5-turbo" selected>GPT-3</option>
+		<option value="gpt-4">GPT-4</option>
+	</select>
+</div>
+
 {#each messages as msg}
 	{#if msg.name === 'assistant'}
 		<!-- ChatGPT -->
