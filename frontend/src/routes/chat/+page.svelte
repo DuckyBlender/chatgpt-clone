@@ -206,7 +206,7 @@
 		class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
 		bind:value={MODEL}
 	>
-		<option value="gpt-3.5-turbo" selected>GPT-3</option>
+		<option value="gpt-3.5-turbo" selected>GPT-3 (10x cheaper)</option>
 		<option value="gpt-4">GPT-4</option>
 	</select>
 </div>
