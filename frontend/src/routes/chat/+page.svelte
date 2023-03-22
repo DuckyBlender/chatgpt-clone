@@ -266,7 +266,7 @@
 	{:else if msg.name === 'user'}
 		<!-- Human -->
 		<div
-			class="my-2 overflow-auto whitespace-pre-line rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md"
+			class="my-2 overflow-auto whitespace-pre rounded-lg border-2 border-blue-600 bg-blue-700 p-2 text-white shadow-md"
 		>
 			<img src="/default.svg" class="mr-1 inline-block h-6 w-6 align-top" alt="OpenAI Logo" />
 			{msg.message}
