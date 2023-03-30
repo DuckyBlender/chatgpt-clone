@@ -185,7 +185,7 @@
 	}
 
 	async function getModel() {
-		let obj = await fetch(`https://api.openai.com/v1/models/`, {
+		let obj = await fetch(`https://api.openai.com/v1/models`, {
 			method: 'GET',
 			headers: {
 				Authorization: 'Bearer ' + API_KEY,
