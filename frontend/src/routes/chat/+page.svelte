@@ -52,6 +52,7 @@
 		if (input !== null) {
 			input.focus();
 		}
+		getModel();
 	});
 
 	function shakeButton() {
@@ -182,7 +183,20 @@
 		// If the prefix is not empty, add a message to the chat
 		addMessage('system', SYSTEM_PREFIX, false);
 	}
-	// Get the bot to say something
+
+	async function getModel() {
+		let obj = await fetch(`https://api.openai.com/v1/models/`, {
+			method: 'GET',
+			headers: {
+				Authorization: 'Bearer ' + API_KEY,
+				'Content-Type': 'application/json'
+			}
+		});
+		let res = await obj.json();
+		console.warn(res);
+	}
+
+	// Get the bot to say something, this is not a bot 💀
 </script>
 
 <svelte:head>
