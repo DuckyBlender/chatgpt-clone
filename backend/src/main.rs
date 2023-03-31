@@ -110,14 +110,16 @@ async fn generate(chat_input: web::Json<ChatInput>) -> impl Responder {
             let body = res.text().await.unwrap();
             // Add this to the log table
             // First, calculate the token amount (it's in the response)
-
             let body: serde_json::Value = serde_json::from_str(&body).unwrap();
             let total_tokens = body["usage"]["total_tokens"].as_i64().unwrap();
+            // also get the model
+            let model = body["model"].to_string();
 
             // Add the tokens to the log table
-            let _ = query("INSERT INTO log (token, tokens) VALUES (?, ?)")
+            let _ = query("INSERT INTO log (token, tokens, model) VALUES (?, ?, ?)")
                 .bind(&token)
                 .bind(total_tokens)
+                .bind(model)
                 .execute(&pool)
                 .await;
 
@@ -296,7 +298,7 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     // Set logging to info
-    env::set_var("RUST_LOG", "debug");
+    env::set_var("RUST_LOG", "info");
     // env::set_var("RUST_BACKTRACE", "1");
 
     // Start the logger
@@ -328,7 +330,7 @@ async fn main() -> std::io::Result<()> {
             .await
             .unwrap();
 
-            query("CREATE TABLE log (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
+            query("CREATE TABLE log (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), model VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
             .execute(&pool)
             .await
             .unwrap();
