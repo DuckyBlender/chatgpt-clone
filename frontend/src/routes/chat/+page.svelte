@@ -28,8 +28,10 @@
 	let isMobile = false;
 	let textarea: HTMLTextAreaElement | null = null;
 
-	let API_KEY = '';
 	let MODEL = 'gpt-3.5-turbo';
+
+	let token: string | null = null;
+	let session: string | null = null;
 
 	async function autoResize() {
 		if (textarea === null) return;
@@ -40,17 +42,16 @@
 	// Focus the textarea
 	onMount(async () => {
 		// Get the token if the user has one
-		let token = localStorage.getItem('token');
-		let userid = localStorage.getItem('session');
-		if (token === null && userid === null) {
+		token = localStorage.getItem('token');
+		session = localStorage.getItem('session');
+		if (token === null && session === null) {
 			// Redirect to the login page if the user is not logged in
 			window.location.href = '/';
 		}
-		if (token === null) {
+		if (session !== null) {
 			mode = MODE.logged_in;
 		} else {
 			mode = MODE.token;
-			API_KEY = token as string;
 		}
 
 		// Also check if the cost count is in the local storage
@@ -138,7 +139,7 @@
 			res = await fetch('https://api.openai.com/v1/chat/completions', {
 				method: 'POST',
 				headers: {
-					Authorization: 'Bearer ' + API_KEY,
+					Authorization: 'Bearer ' + token,
 					'Content-Type': 'application/json'
 				},
 
@@ -154,7 +155,7 @@
 						content: msg.message
 					};
 				}),
-				token: localStorage.getItem('session')
+				token: session
 			};
 
 			res = await fetch('https://gptapi.ducky.pics/generate', {
@@ -223,11 +224,12 @@
 
 	async function fetchModels() {
 		if (mode === MODE.token) {
+			console.log('fetching models with token');
 			// if the user has a token, fetch the models
 			let obj = await fetch(`https://api.openai.com/v1/models`, {
 				method: 'GET',
 				headers: {
-					Authorization: 'Bearer ' + API_KEY,
+					Authorization: 'Bearer ' + token,
 					'Content-Type': 'application/json'
 				}
 			});
@@ -244,6 +246,7 @@
 			});
 			return models;
 		} else if (mode === MODE.logged_in) {
+			console.log('fetching models with session');
 			let models = [];
 			// if the user doesn't have a token, just show the GPT-3 and GPT-4 models
 			models.push('gpt-3.5-turbo');
@@ -472,6 +475,7 @@
 		on:click={() => {
 			localStorage.removeItem('token');
 			localStorage.removeItem('session');
+			localStorage.removeItem('totalCost');
 			window.location.href = '/';
 		}}
 		class="rounded-md bg-blue-500 p-2 text-white shadow-md"

@@ -22,6 +22,8 @@
 </script>
 
 <svelte:head>
+	<!-- Title -->
+	<title>ChatGPT Clone</title>
 	<!-- Meta tags for discord embed -->
 	<meta property="og:title" content="ChatGPT" />
 	<meta
