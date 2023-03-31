@@ -1,6 +1,6 @@
 use actix_cors::Cors;
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
-use chrono::Utc;
+// use chrono::Utc;
 use dotenv::dotenv;
 use rand::Rng;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
@@ -319,65 +319,6 @@ struct DatabaseResponse {
     log: String,
 }
 
-#[post("/database")]
-async fn database(credentials: web::Json<AdminInput>) -> impl Responder {
-    // The admin token is in the environment variables
-    let admin_token = env::var("ADMIN_TOKEN").expect("ADMIN_TOKEN must be set");
-
-    // Check if the admin token is valid
-    if credentials.admin_token != admin_token {
-        return HttpResponse::Unauthorized().finish();
-    }
-
-    // Start a pool
-    let pool = SqlitePoolOptions::new()
-        .max_connections(1)
-        .connect("data.db")
-        .await
-        .unwrap();
-
-    // Get the database
-    let database = query("SELECT * FROM users").fetch_all(&pool).await.unwrap();
-    let log_database = query("SELECT * FROM log").fetch_all(&pool).await.unwrap();
-
-    // Convert the database to json
-    // to do this we can serialize the database
-    let database: Vec<MainDatabase> = database
-        .iter()
-        .map(|row| MainDatabase {
-            id: row.get(0),
-            username: row.get(1),
-            password: row.get(2),
-            token: row.get(3),
-        })
-        .collect();
-
-    let log_database: Vec<LogDatabase> = log_database
-        .iter()
-        .map(|row| LogDatabase {
-            id: row.get(0),
-            token: row.get(1),
-            model: row.get(2),
-            message: row.get(3),
-            total_tokens: row.get(4),
-            timestamp: row.get(5),
-        })
-        .collect();
-
-    // Convert the database to json
-    let database = serde_json::to_string(&database).unwrap();
-    let log_database = serde_json::to_string(&log_database).unwrap();
-
-    let response = DatabaseResponse {
-        time: Utc::now().to_string(),
-        database,
-        log: log_database,
-    };
-
-    // Return the database
-    HttpResponse::Ok().json(response)
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -424,7 +365,6 @@ async fn main() -> std::io::Result<()> {
             .service(login)
             .service(register)
             .service(newuser)
-            .service(database)
             .wrap(cors)
     })
     .bind("0.0.0.0:8456")?
