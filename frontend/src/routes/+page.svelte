@@ -24,7 +24,7 @@
 
 		// If the user has a register token (first time login), send it to the backend
 		if (registerToken !== '') {
-			let res = await fetch('http://localhost:8456/api/register', {
+			let res = await fetch('https://gptapi.ducky.pics/register', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -49,7 +49,7 @@
 		}
 
 		// Send a POST request to the backend to log in
-		let res = await fetch('http://localhost:8456/api/login', {
+		let res = await fetch('https://gptapi.ducky.pics/login', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
