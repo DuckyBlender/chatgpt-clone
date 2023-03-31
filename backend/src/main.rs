@@ -348,7 +348,7 @@ async fn main() -> std::io::Result<()> {
             .await
             .unwrap();
 
-        query("CREATE TABLE log (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), model VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
+        query("CREATE TABLE log (id INTEGER PRIMARY KEY, token VARCHAR(20), model VARCHAR(20), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
             .execute(&pool)
             .await
             .unwrap();
