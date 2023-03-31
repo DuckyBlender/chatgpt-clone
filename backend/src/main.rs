@@ -1,14 +1,10 @@
 use actix_cors::Cors;
-use actix_extensible_rate_limit::{
-    backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
-    RateLimiter,
-};
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use rand::Rng;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
-use std::{env, fs::File, path::Path, time::Duration};
+use std::{env, fs::File, path::Path};
 
 use argon2::Argon2;
 
@@ -16,6 +12,18 @@ use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::{query, Row};
 
 const MODELS: [&str; 2] = ["gpt-4", "gpt-3.5-turbo"];
+
+fn generate_token() -> String {
+    let mut rng = rand::thread_rng();
+    let token = format!(
+        "{}-{}-{}-{}",
+        rng.gen_range(1000..9999),
+        rng.gen_range(1000..9999),
+        rng.gen_range(1000..9999),
+        rng.gen_range(1000..9999)
+    );
+    token
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Message {
@@ -56,10 +64,14 @@ async fn generate(chat_input: web::Json<ChatInput>) -> impl Responder {
         .await;
 
     // Check if the token is valid
-    if user.is_err() {
+    if let Ok(user) = user {
+        if user.len() > 1 {
+            return HttpResponse::InternalServerError().body("There are multiple users with the same token. Please contact the developer. This is insanely rare!");
+        } else if user.len() == 0 {
+            return HttpResponse::Unauthorized().body("Invalid token");
+        }
+    } else {
         return HttpResponse::Unauthorized().finish();
-    } else if user.unwrap().len() > 1 {
-        return HttpResponse::InternalServerError().finish();
     }
 
     // Check if the model is valid
@@ -139,12 +151,14 @@ async fn register(body: web::Json<RegisterInput>) -> impl Responder {
         .await;
 
     // Check if the token is valid
-    if user.is_err() {
+    if let Ok(user) = user {
+        if user.len() > 1 {
+            return HttpResponse::InternalServerError().finish();
+        } else if user.len() == 0 {
+            return HttpResponse::Unauthorized().finish();
+        }
+    } else {
         return HttpResponse::Unauthorized().finish();
-    } else if user.unwrap().len() > 1 {
-        // if this happens something is seriously wrong
-        println!("More than one user with the same token: {}", token);
-        return HttpResponse::InternalServerError().finish();
     }
 
     // Check if the username is taken
@@ -169,16 +183,20 @@ async fn register(body: web::Json<RegisterInput>) -> impl Responder {
         .unwrap();
     // The hashed password is now in the output_key_material variable
 
+    // For security reasons, we should regenerate the token
+    let new_token = generate_token();
+
     // Update the users credentials
-    let _ = query("UPDATE users SET username = ?, password = ? WHERE token = ?")
+    let _ = query("UPDATE users SET username = ?, password = ?, token = ? WHERE token = ?")
         .bind(&username)
         .bind(&hashed_password.to_vec())
+        .bind(&new_token)
         .bind(&token)
         .execute(&pool)
         .await;
 
-    // Return that the register token is successful
-    HttpResponse::Ok().finish()
+    // Return the new token
+    HttpResponse::Ok().body(new_token)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -260,14 +278,7 @@ async fn newuser(credentials: web::Json<NewUserInput>) -> impl Responder {
         .unwrap();
 
     // Generate a token
-    let mut rng = rand::thread_rng();
-    let token = format!(
-        "{}-{}-{}-{}",
-        rng.gen_range(1000..9999),
-        rng.gen_range(1000..9999),
-        rng.gen_range(1000..9999),
-        rng.gen_range(1000..9999)
-    );
+    let token = generate_token();
 
     // Create the user
     query("INSERT INTO users (token) VALUES (?)")
@@ -290,9 +301,6 @@ async fn main() -> std::io::Result<()> {
 
     // Start the logger
     env_logger::init();
-
-    // A database for storing requests for rate limiting
-    let backend = InMemoryBackend::builder().build();
 
     // Check if the database exists
     if !Path::new("data.db").exists() {
@@ -320,30 +328,14 @@ async fn main() -> std::io::Result<()> {
             .await
             .unwrap();
 
-            query("CREATE TABLE logs (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
+            query("CREATE TABLE log (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
             .execute(&pool)
             .await
             .unwrap();
-
-            // Create the admin user for testing
-            query("INSERT INTO users (username, password) VALUES (?, ?)")
-                .bind("admin")
-                .bind("admin123")
-                .execute(&pool)
-                .await
-                .unwrap();
         }
     }
 
     HttpServer::new(move || {
-        // Assign a limit of 5 requests per minute per client ip address
-        let input = SimpleInputFunctionBuilder::new(Duration::from_secs(5), 1)
-            .real_ip_key()
-            .build();
-        let rate_limit = RateLimiter::builder(backend.clone(), input)
-            .add_headers()
-            .build();
-
         let cors = Cors::default()
             .allow_any_origin()
             .allow_any_method()
@@ -354,7 +346,6 @@ async fn main() -> std::io::Result<()> {
             .service(login)
             .service(register)
             .service(newuser)
-            .wrap(rate_limit)
             .wrap(cors)
     })
     .bind("0.0.0.0:8456")?
