@@ -16,3 +16,4 @@ backend/Cargo.lock
 backend/**/*.rs.bk
 backend/*.pdb
 backend/.env
+backend/data.db

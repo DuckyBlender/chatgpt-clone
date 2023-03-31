@@ -4,6 +4,12 @@
 	import RegenerateButton from '../../components/RegenerateButton.svelte';
 	import ThinkingIndicator from '../../components/ThinkingIndicator.svelte';
 
+	enum MODE {
+		'loading',
+		'logged_in',
+		'token'
+	}
+
 	// const SYSTEM_PREFIX = `You are a tutor that always responds in the Socratic style. You *never* give the student the answer, but always try to ask just the right question to help them learn to think for themselves. You should always tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.`;
 	const SYSTEM_PREFIX = ``;
 
@@ -12,6 +18,7 @@
 	let models: string[] = [];
 	var thinking = false;
 	const timeout = 0;
+	let mode = MODE.loading;
 
 	let cooldownTimer = 0;
 	let cooldown = false;
@@ -34,12 +41,17 @@
 	onMount(async () => {
 		// Get the token if the user has one
 		let token = localStorage.getItem('token');
-		let userid = localStorage.getItem('userid');
+		let userid = localStorage.getItem('session');
 		if (token === null && userid === null) {
 			// Redirect to the login page if the user is not logged in
 			window.location.href = '/';
 		}
-		API_KEY = token as string;
+		if (token === null) {
+			mode = MODE.logged_in;
+		} else {
+			mode = MODE.token;
+			API_KEY = token as string;
+		}
 
 		// Also check if the cost count is in the local storage
 		let cost = localStorage.getItem('totalCost');
@@ -59,7 +71,7 @@
 		if (input !== null) {
 			input.focus();
 		}
-		models = await fetchModels();
+		models = (await fetchModels()) as string[];
 	});
 
 	function shakeButton() {
@@ -80,7 +92,7 @@
 		});
 
 		// Create a Blob with the text content
-		let blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+		let blob = new Blob([encodeURIComponent(text)], { type: 'text/plain;charset=utf-8' });
 
 		// Create a URL to represent the Blob
 		let url = URL.createObjectURL(blob);
@@ -108,28 +120,52 @@
 			return;
 		}
 		thinking = true;
-		// send the message to the server
-		let requestBody = {
-			model: MODEL,
-			messages: messages.map((msg) => {
-				return {
-					role: msg.name,
-					content: msg.message
-				};
-			})
-		};
 
 		thinking = true;
-		let res = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				Authorization: 'Bearer ' + API_KEY,
-				'Content-Type': 'application/json'
-			},
+		let res: Response;
+		if (mode === MODE.token) {
+			// if the user has a token, use it
+			let requestBody = {
+				model: MODEL,
+				messages: messages.map((msg) => {
+					return {
+						role: msg.name,
+						content: msg.message
+					};
+				})
+			};
 
-			body: JSON.stringify(requestBody)
-		});
-		// get the response from the server
+			res = await fetch('https://api.openai.com/v1/chat/completions', {
+				method: 'POST',
+				headers: {
+					Authorization: 'Bearer ' + API_KEY,
+					'Content-Type': 'application/json'
+				},
+
+				body: JSON.stringify(requestBody)
+			});
+		} else {
+			// if the user doesn't have a token, send a request to the custom api with the session instead
+			let requestBody = {
+				model: MODEL,
+				messages: messages.map((msg) => {
+					return {
+						role: msg.name,
+						content: msg.message
+					};
+				}),
+				token: localStorage.getItem('session')
+			};
+
+			res = await fetch('https://gptapi.ducky.pics/generate', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(requestBody)
+			});
+		}
+
 		if (res.ok) {
 			let response_json = await res.json();
 			// check if this contains an "error" field
@@ -186,25 +222,34 @@
 	}
 
 	async function fetchModels() {
-		let obj = await fetch(`https://api.openai.com/v1/models`, {
-			method: 'GET',
-			headers: {
-				Authorization: 'Bearer ' + API_KEY,
-				'Content-Type': 'application/json'
-			}
-		});
-		let res = await obj.json();
+		if (mode === MODE.token) {
+			// if the user has a token, fetch the models
+			let obj = await fetch(`https://api.openai.com/v1/models`, {
+				method: 'GET',
+				headers: {
+					Authorization: 'Bearer ' + API_KEY,
+					'Content-Type': 'application/json'
+				}
+			});
+			let res = await obj.json();
 
-		// we only want to add the the gpt-3 and gpt-4 models to the models string array, also exclude the gpt-4-xxxx models and gpt-3-xxxx models. this is in typescript
-		res.data.forEach((model: any) => {
-			if (
-				(model.id.startsWith('gpt-3.5-turbo') && !model.id.startsWith('gpt-3.5-turbo-')) ||
-				(model.id.startsWith('gpt-4') && !model.id.startsWith('gpt-4-'))
-			) {
-				models.push(model.id);
-			}
-		});
-		return models;
+			// we only want to add the the gpt-3 and gpt-4 models to the models string array, also exclude the gpt-4-xxxx models and gpt-3-xxxx models. this is in typescript
+			res.data.forEach((model: any) => {
+				if (
+					(model.id.startsWith('gpt-3.5-turbo') && !model.id.startsWith('gpt-3.5-turbo-')) ||
+					(model.id.startsWith('gpt-4') && !model.id.startsWith('gpt-4-'))
+				) {
+					models.push(model.id);
+				}
+			});
+			return models;
+		} else if (mode === MODE.logged_in) {
+			let models = [];
+			// if the user doesn't have a token, just show the GPT-3 and GPT-4 models
+			models.push('gpt-3.5-turbo');
+			models.push('gpt-4');
+			return models;
+		}
 	}
 </script>
 
@@ -426,6 +471,7 @@
 	<button
 		on:click={() => {
 			localStorage.removeItem('token');
+			localStorage.removeItem('session');
 			window.location.href = '/';
 		}}
 		class="rounded-md bg-blue-500 p-2 text-white shadow-md"

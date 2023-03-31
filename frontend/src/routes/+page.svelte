@@ -5,6 +5,7 @@
 	let token = '';
 	let username = '';
 	let password = '';
+	let registerToken = '';
 
 	onMount(() => {
 		// Check if the user is logged in
@@ -16,11 +17,39 @@
 
 	async function loginPassword() {
 		console.log('Logging in...');
-		// Get the username and password from the form
+		// Get the username and password and register token from the form
 		let username = (document.getElementById('username') as HTMLInputElement).value;
 		let password = (document.getElementById('password') as HTMLInputElement).value;
+		let registerToken = (document.getElementById('registerToken') as HTMLInputElement).value;
+
+		// If the user has a register token (first time login), send it to the backend
+		if (registerToken !== '') {
+			let res = await fetch('https://gptapi.ducky.pics/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					login: username,
+					password,
+					register_token: registerToken
+				})
+			});
+			if (!res.ok) {
+				// If the response is not successful, show an error message
+				alert('Something went wrong');
+				console.error(await res.text());
+				return;
+			}
+			// If the response is successful, show a success message, add the token to the localstorage and redirect to the chat page
+
+			localStorage.setItem('session', await res.text());
+			window.location.href = '/chat';
+			return;
+		}
+
 		// Send a POST request to the backend to log in
-		let res = await fetch('/api/login', {
+		let res = await fetch('https://gptapi.ducky.pics/login', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -35,10 +64,8 @@
 			alert('Something went wrong');
 			return;
 		}
-		// Get the response from the backend
-		let res_json = await res.json();
 		// If the response is successful, save the token to the local storage
-		localStorage.setItem('userid', res_json.userid);
+		localStorage.setItem('token', await res.text());
 		// Redirect to the chat page
 		window.location.href = '/chat';
 	}
@@ -112,6 +139,19 @@
 			on:input={checkPassword}
 			required
 		/>
+		<br />
+		<!-- Optionally a first-time token to then create the password -->
+		<label for="token">Register token</label>
+		<input
+			type="password"
+			name="registerToken"
+			id="registerToken"
+			class="w-full rounded-md bg-gray-300 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
+			placeholder="xxxx-xxxx-xxxx-xxxx"
+			bind:value={registerToken}
+			on:input={checkPassword}
+		/>
+
 		<button
 			type="submit"
 			id="submitPassword"
