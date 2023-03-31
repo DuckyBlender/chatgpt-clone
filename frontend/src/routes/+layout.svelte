@@ -41,13 +41,13 @@
 	<div class="w-full">
 		<!-- Header -->
 		<div
-			class="mb-4 flex flex-row justify-between overflow-auto rounded-lg bg-gradient-to-bl from-slate-100 to-slate-200 p-4 text-slate-800 shadow-xl  dark:from-slate-700 dark:to-slate-600 dark:text-slate-100"
+			class="mb-4 flex flex-row justify-between overflow-auto rounded-lg bg-gradient-to-bl from-slate-100 to-slate-200 p-4 text-slate-800 shadow-xl dark:from-slate-700 dark:to-slate-600 dark:text-slate-100"
 		>
-			<div class="text-left ">
+			<div class="text-left">
 				<!-- Title -->
 				<h1 class="text-2xl font-bold">ChatGPT</h1>
 				<!-- Subtitle -->
-				<p class="text-sm ">An advanced AI chatbot powered by GPT-4</p>
+				<p class="text-sm">An advanced AI chatbot powered by OpenAI</p>
 			</div>
 			<div class="text-right">
 				<h1 class="text-md mb-1 font-light">Website by DuckyBlender</h1>

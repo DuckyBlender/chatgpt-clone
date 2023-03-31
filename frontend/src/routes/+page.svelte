@@ -76,7 +76,7 @@
 
 <!-- This is the page when the user is not logged in -->
 <p
-	class="mt-4 mb-4 text-center text-2xl font-bold text-gray-800  dark:text-gray-200 md:text-3xl lg:text-4xl"
+	class="mb-4 mt-4 text-center text-2xl font-bold text-gray-800 dark:text-gray-200 md:text-3xl lg:text-4xl"
 >
 	You are not logged in. Please log in to continue.
 </p>
@@ -85,9 +85,9 @@
 	Log in with an account or input an OpenAI API token to continue.
 	<!-- This is the login form -->
 </p>
-<div class="flex flex-wrap items-center justify-center rounded-lg p-4 shadow-md">
+<div class="flex flex-wrap items-center justify-center rounded-lg p-4">
 	<div
-		class="m-4 flex w-full cursor-not-allowed flex-col items-center justify-center rounded-lg border-2 border-gray-400 bg-gray-200 p-4 opacity-30 shadow-md dark:bg-gray-800 md:w-1/2 lg:w-1/3"
+		class="m-4 flex w-full flex-col items-center justify-center rounded-lg border-2 border-gray-400 bg-gray-200 p-4 shadow-md dark:bg-gray-800 md:w-1/2 lg:w-1/3"
 	>
 		<p>Log in with a username and password</p>
 		<label for="username">Username</label>
@@ -95,7 +95,7 @@
 			type="text"
 			name="username"
 			id="username"
-			class="w-full bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
+			class="w-full rounded-md bg-gray-300 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Username"
 			bind:value={username}
 			on:input={checkPassword}
@@ -106,7 +106,7 @@
 			type="password"
 			name="password"
 			id="password"
-			class="w-full bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
+			class="w-full rounded-md bg-gray-300 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Password"
 			bind:value={password}
 			on:input={checkPassword}
@@ -138,7 +138,7 @@
 			type="text"
 			name="token"
 			id="token"
-			class="w-full bg-gray-200 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
+			class="w-full rounded-md bg-gray-300 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
 			placeholder="Token"
 			bind:value={token}
 			on:input={checkToken}
