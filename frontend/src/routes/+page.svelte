@@ -58,10 +58,20 @@
 				password
 			})
 		});
-		if (!res.ok) {
-			// If the response is not successful, show an error message
-			alert('Something went wrong');
-			return;
+		// Get staus code
+		switch (res.status) {
+			case 401:
+				// If the status code is 401, show an error message
+				alert('Wrong username or password');
+				return;
+			case 403:
+				// If the status code is 403, show an error message
+				alert('You are not allowed to log in');
+				return;
+			case 500:
+				// If the status code is 500, show an error message
+				alert('Something went wrong');
+				return;
 		}
 		// If the response is successful, save the token to the local storage
 		localStorage.setItem('session', await res.text());
