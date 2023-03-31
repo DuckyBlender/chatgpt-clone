@@ -1,5 +1,6 @@
 use actix_cors::Cors;
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
+use chrono::Utc;
 use dotenv::dotenv;
 use rand::Rng;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
@@ -116,7 +117,7 @@ async fn generate(chat_input: web::Json<ChatInput>) -> impl Responder {
             let model = body["model"].to_string();
 
             // Add the tokens to the log table
-            let _ = query("INSERT INTO log (token, tokens, model) VALUES (?, ?, ?)")
+            let _ = query("INSERT INTO log (token, total_tokens, model) VALUES (?, ?, ?)")
                 .bind(&token)
                 .bind(total_tokens)
                 .bind(model)
@@ -258,12 +259,12 @@ async fn login(credentials: web::Json<LoginInput>) -> impl Responder {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct NewUserInput {
+struct AdminInput {
     admin_token: String,
 }
 
 #[post("/newuser")]
-async fn newuser(credentials: web::Json<NewUserInput>) -> impl Responder {
+async fn newuser(credentials: web::Json<AdminInput>) -> impl Responder {
     // The admin token is in the environment variables
     let admin_token = env::var("ADMIN_TOKEN").expect("ADMIN_TOKEN must be set");
 
@@ -293,6 +294,90 @@ async fn newuser(credentials: web::Json<NewUserInput>) -> impl Responder {
     HttpResponse::Ok().body(token)
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct MainDatabase {
+    id: i32,
+    username: String,
+    password: Vec<u8>,
+    token: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct LogDatabase {
+    id: i32,
+    token: String,
+    model: String,
+    message: String,
+    total_tokens: i32,
+    timestamp: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct DatabaseResponse {
+    time: String,
+    database: String,
+    log: String,
+}
+
+#[post("/database")]
+async fn database(credentials: web::Json<AdminInput>) -> impl Responder {
+    // The admin token is in the environment variables
+    let admin_token = env::var("ADMIN_TOKEN").expect("ADMIN_TOKEN must be set");
+
+    // Check if the admin token is valid
+    if credentials.admin_token != admin_token {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    // Start a pool
+    let pool = SqlitePoolOptions::new()
+        .max_connections(1)
+        .connect("data.db")
+        .await
+        .unwrap();
+
+    // Get the database
+    let database = query("SELECT * FROM users").fetch_all(&pool).await.unwrap();
+    let log_database = query("SELECT * FROM log").fetch_all(&pool).await.unwrap();
+
+    // Convert the database to json
+    // to do this we can serialize the database
+    let database: Vec<MainDatabase> = database
+        .iter()
+        .map(|row| MainDatabase {
+            id: row.get(0),
+            username: row.get(1),
+            password: row.get(2),
+            token: row.get(3),
+        })
+        .collect();
+
+    let log_database: Vec<LogDatabase> = log_database
+        .iter()
+        .map(|row| LogDatabase {
+            id: row.get(0),
+            token: row.get(1),
+            model: row.get(2),
+            message: row.get(3),
+            total_tokens: row.get(4),
+            timestamp: row.get(5),
+        })
+        .collect();
+
+    // Convert the database to json
+    let database = serde_json::to_string(&database).unwrap();
+    let log_database = serde_json::to_string(&log_database).unwrap();
+
+    let response = DatabaseResponse {
+        time: Utc::now().to_string(),
+        database,
+        log: log_database,
+    };
+
+    // Return the database
+    HttpResponse::Ok().json(response)
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -315,26 +400,17 @@ async fn main() -> std::io::Result<()> {
             .connect("data.db")
             .await
             .unwrap();
-        // This will work everywhere
 
-        // Check if the database exists
-        let tables = query("SELECT name FROM sqlite_master WHERE type='table'")
-            .fetch_all(&pool)
-            .await
-            .unwrap();
-
-        if tables.len() < 1 {
-            // Create the table
-            query("CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR(255), password BLOB, token VARCHAR(20))")
+        // Create the table
+        query("CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR(255), password BLOB, token VARCHAR(20))")
             .execute(&pool)
             .await
             .unwrap();
 
-            query("CREATE TABLE log (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), model VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
+        query("CREATE TABLE log (id INTEGER PRIMARY KEY, username VARCHAR(255), token VARCHAR(20), model VARCHAR(20), message VARCHAR(255), total_tokens INTEGER DEFAULT 0, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")
             .execute(&pool)
             .await
             .unwrap();
-        }
     }
 
     HttpServer::new(move || {
@@ -348,6 +424,7 @@ async fn main() -> std::io::Result<()> {
             .service(login)
             .service(register)
             .service(newuser)
+            .service(database)
             .wrap(cors)
     })
     .bind("0.0.0.0:8456")?
