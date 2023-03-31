@@ -44,7 +44,7 @@
 		}
 
 		// Send a POST request to the backend to log in
-		let res = await fetch('/api/login', {
+		let res = await fetch('http://localhost:8456/api/login', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
