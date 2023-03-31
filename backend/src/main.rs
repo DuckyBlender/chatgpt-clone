@@ -44,7 +44,7 @@ struct ChatOutput {
     messages: Vec<Message>,
 }
 
-#[post("/api/generate")]
+#[post("/generate")]
 async fn generate(chat_input: web::Json<ChatInput>) -> impl Responder {
     // Check if the key is valid
     let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
@@ -134,7 +134,7 @@ struct RegisterInput {
     password: String,
 }
 
-#[post("/api/register")]
+#[post("/register")]
 async fn register(body: web::Json<RegisterInput>) -> impl Responder {
     // Check if the token is valid
     let token = body.register_token.clone();
@@ -205,7 +205,7 @@ struct LoginInput {
     password: String,
 }
 
-#[post("/api/login")]
+#[post("/login")]
 async fn login(credentials: web::Json<LoginInput>) -> impl Responder {
     // Check the database
     let username = credentials.username.clone();
@@ -260,7 +260,7 @@ struct NewUserInput {
     admin_token: String,
 }
 
-#[post("/api/newuser")]
+#[post("/newuser")]
 async fn newuser(credentials: web::Json<NewUserInput>) -> impl Responder {
     // The admin token is in the environment variables
     let admin_token = env::var("ADMIN_TOKEN").expect("ADMIN_TOKEN must be set");

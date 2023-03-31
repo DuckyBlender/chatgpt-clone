@@ -20,19 +20,19 @@
 		// Get the username and password and register token from the form
 		let username = (document.getElementById('username') as HTMLInputElement).value;
 		let password = (document.getElementById('password') as HTMLInputElement).value;
-		let registerToken = (document.getElementById('token') as HTMLInputElement).value;
+		let registerToken = (document.getElementById('registerToken') as HTMLInputElement).value;
 
 		// If the user has a register token (first time login), send it to the backend
 		if (registerToken !== '') {
-			let res = await fetch('/api/register', {
+			let res = await fetch('http://localhost:8456/api/register', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					username,
+					login: username,
 					password,
-					registerToken
+					register_token: registerToken
 				})
 			});
 			if (!res.ok) {
@@ -41,6 +41,11 @@
 				console.error(await res.text());
 				return;
 			}
+			// If the response is successful, show a success message, add the token to the localstorage and redirect to the chat page
+
+			localStorage.setItem('session', await res.text());
+			window.location.href = '/chat';
+			return;
 		}
 
 		// Send a POST request to the backend to log in
@@ -59,10 +64,8 @@
 			alert('Something went wrong');
 			return;
 		}
-		// Get the response from the backend
-		let res_json = await res.json();
 		// If the response is successful, save the token to the local storage
-		localStorage.setItem('userid', res_json.userid);
+		localStorage.setItem('token', await res.text());
 		// Redirect to the chat page
 		window.location.href = '/chat';
 	}
