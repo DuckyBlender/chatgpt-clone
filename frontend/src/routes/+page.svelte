@@ -9,7 +9,7 @@
 
 	onMount(() => {
 		// Check if the user is logged in
-		if (localStorage.getItem('token')) {
+		if (localStorage.getItem('token') || localStorage.getItem('session')) {
 			// If the user is logged in, redirect to the chat page
 			window.location.href = '/chat';
 		}
@@ -45,7 +45,6 @@
 
 			localStorage.setItem('session', await res.text());
 			window.location.href = '/chat';
-			return;
 		}
 
 		// Send a POST request to the backend to log in
@@ -65,7 +64,7 @@
 			return;
 		}
 		// If the response is successful, save the token to the local storage
-		localStorage.setItem('token', await res.text());
+		localStorage.setItem('session', await res.text());
 		// Redirect to the chat page
 		window.location.href = '/chat';
 	}
