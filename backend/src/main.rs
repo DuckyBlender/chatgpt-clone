@@ -355,6 +355,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
+        // Allow all origins
         let cors = Cors::default()
             .allow_any_origin()
             .allow_any_method()
