@@ -158,21 +158,12 @@
 				token: session
 			};
 
-			// res = await fetch('https://gptapi.ducky.pics/generate', {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Content-Type': 'application/json'
-			// 	},
-			// 	body: JSON.stringify(requestBody)
-			// });
-			// To set the request to 'no-cors'
 			res = await fetch('https://gptapi.ducky.pics/generate', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(requestBody),
-				mode: 'no-cors'
+				body: JSON.stringify(requestBody)
 			});
 		}
 
