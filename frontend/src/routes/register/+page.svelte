@@ -135,8 +135,6 @@
 			Register
 		</button>
 		<!-- Go back to login -->
-		<a href="/" class="mt-4 text-xs text-blue-400 hover:text-blue-500"
-			>Nevermind, go back to login</a
-		>
+		<a href="/" class=" text-xs text-blue-400 hover:text-blue-500"> Nevermind, go back to login </a>
 	</div>
 </div>

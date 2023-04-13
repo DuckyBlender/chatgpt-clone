@@ -65,7 +65,7 @@
 		// Set it to 64px
 		textarea.style.height = '64px';
 
-		// Check if the user is on mobile
+		// Check if the user is on mobile, we need this to fix newlines on mobile
 		isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 		let input = document.getElementById('messageInput');
@@ -87,10 +87,6 @@
 	}
 
 	function saveMessages() {
-		// Save the messages in a human readable format like this:
-		// User: Hello
-		// Assistant: Hi
-
 		let text = '';
 		for (let msg of messages) {
 			text += msg.name + ': ' + msg.message + '\n';
