@@ -1,6 +1,7 @@
-use actix_web::http::header;
+use actix_cors::Cors;
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
 // use chrono::Utc;
+use actix_web::middleware::Logger;
 use dotenv::dotenv;
 use rand::Rng;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
@@ -355,7 +356,17 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
+        // This allows the server to be accessed from https://chat.ducky.pics and only allows GET and POST requests from that domain.
+        let cors = Cors::permissive()
+            .allowed_origin("https://chat.ducky.pics")
+            .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+            .allow_any_header()
+            .supports_credentials() // This allows cookies to be sent
+            .max_age(3600);
+
         App::new()
+            .wrap(Logger::default())
+            .wrap(cors)
             .service(generate)
             .service(login)
             .service(register)
