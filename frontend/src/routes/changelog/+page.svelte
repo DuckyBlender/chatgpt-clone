@@ -4,4 +4,5 @@
 >
 	<p>Ta podstrona jest w trakcie tworzenia.</p>
 	<a href="/" class="text-blue-400">Wróć na główną stronę</a>
+	<!-- Simple format for the changelog. This includes the date, commit hash, short description. Create a template -->
 </div>
