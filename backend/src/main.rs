@@ -1,4 +1,3 @@
-use actix_cors::Cors;
 use actix_web::http::header;
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
 // use chrono::Utc;
@@ -356,16 +355,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
-        // Allow only chat.ducky.pics to access the API
-        let cors = Cors::default()
-            .allowed_origin("https://chat.ducky.pics")
-            .allowed_methods(vec!["GET", "POST"])
-            .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
-            .allowed_header(header::CONTENT_TYPE)
-            .max_age(3600);
-
         App::new()
-            .wrap(cors)
             .service(generate)
             .service(login)
             .service(register)
