@@ -362,7 +362,7 @@ async fn main() -> std::io::Result<()> {
             .allow_any_header();
 
         App::new()
-            .wrap(cors)
+            // .wrap(cors)
             .service(generate)
             .service(login)
             .service(register)
