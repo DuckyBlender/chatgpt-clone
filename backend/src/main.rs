@@ -357,8 +357,9 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         // This allows the server to be accessed from https://chat.ducky.pics and only allows GET and POST requests from that domain.
-        let cors = Cors::permissive()
+        let cors = Cors::default()
             .allowed_origin("https://chat.ducky.pics")
+            // .allowed_origin("http://localhost:5173")
             .allowed_methods(vec!["GET", "POST", "OPTIONS"])
             .allow_any_header()
             .supports_credentials() // This allows cookies to be sent

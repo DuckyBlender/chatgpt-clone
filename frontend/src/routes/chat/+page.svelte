@@ -155,8 +155,7 @@
 			res = await fetch('https://gptapi.ducky.pics/generate', {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
-					'Access-Control-Allow-Origin': '*' // this is needed for the custom api to work
+					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(requestBody)
 			});

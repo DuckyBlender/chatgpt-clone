@@ -5,7 +5,6 @@
 	let token = '';
 	let username = '';
 	let password = '';
-	let registerToken = '';
 
 	onMount(() => {
 		// Check if the user is logged in
@@ -20,32 +19,6 @@
 		// Get the username and password and register token from the form
 		let username = (document.getElementById('username') as HTMLInputElement).value;
 		let password = (document.getElementById('password') as HTMLInputElement).value;
-		let registerToken = (document.getElementById('registerToken') as HTMLInputElement).value;
-
-		// If the user has a register token (first time login), send it to the backend
-		if (registerToken !== '') {
-			let res = await fetch('https://gptapi.ducky.pics/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					login: username,
-					password,
-					register_token: registerToken
-				})
-			});
-			if (!res.ok) {
-				// If the response is not successful, show an error message
-				alert('Something went wrong');
-				console.error(await res.text());
-				return;
-			}
-			// If the response is successful, show a success message, add the token to the localstorage and redirect to the chat page
-
-			localStorage.setItem('session', await res.text());
-			window.location.href = '/chat';
-		}
 
 		// Send a POST request to the backend to log in
 		let res = await fetch('https://gptapi.ducky.pics/login', {
@@ -70,6 +43,13 @@
 				return;
 			case 500:
 				// If the status code is 500, show an error message
+				alert('Something went wrong');
+				return;
+			// If the status code is 200, continue
+			case 200:
+				break;
+			// If the status code is not 200, 401, 403 or 500, show an error message
+			default:
 				alert('Something went wrong');
 				return;
 		}
@@ -148,9 +128,11 @@
 			on:input={checkPassword}
 			required
 		/>
-		<br />
 		<!-- Optionally a first-time token to then create the password -->
-		<label for="token">Register token</label>
+		<a href="/register" class=" border-blue-400 p-2 text-sm text-blue-400  hover:text-blue-500"
+			>Register</a
+		>
+		<!-- <label for="token">Register token</label>
 		<input
 			type="password"
 			name="registerToken"
@@ -159,7 +141,7 @@
 			placeholder="xxxx-xxxx-xxxx-xxxx"
 			bind:value={registerToken}
 			on:input={checkPassword}
-		/>
+		/> -->
 
 		<button
 			type="submit"
