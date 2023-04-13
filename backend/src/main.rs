@@ -355,13 +355,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
-        // Allow only origin from https://chat.ducky.pics or https://chatgpt.ducky.pics
-        let cors = Cors::default()
-            .allowed_origin("https://chat.ducky.pics")
-            .allowed_methods(vec!["GET", "POST", "OPTIONS"])
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
-            .max_age(3600);
+        let cors = Cors::permissive();
+        // TODO: Make this more secure by only allowing the chat.ducky.pics domain
 
         App::new()
             .wrap(cors)
