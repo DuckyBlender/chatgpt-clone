@@ -87,13 +87,24 @@
 	}
 
 	function saveMessages() {
-		// Save the messages using the messages list. Also keep in mind UTF-8 encoding
-		let encodedMessages = encodeURIComponent(JSON.stringify(messages));
-		// Make download link
-		let link = document.createElement('a');
-		link.href = 'data:text/plain;charset=utf-8,' + encodedMessages;
-		link.download = 'messages.txt';
-		link.click();
+		// Save the messages in a human readable format like this:
+		// User: Hello
+		// Assistant: Hi
+
+		let text = '';
+		for (let msg of messages) {
+			text += msg.name + ': ' + msg.message + '\n';
+		}
+
+		// Download the file
+		let element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+		element.setAttribute('download', 'messages.txt');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
 	}
 
 	// add messages to the array
