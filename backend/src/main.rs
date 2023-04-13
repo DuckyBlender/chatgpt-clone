@@ -1,5 +1,5 @@
 use actix_cors::Cors;
-use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{http, post, web, App, HttpResponse, HttpServer, Responder};
 // use chrono::Utc;
 use dotenv::dotenv;
 use rand::Rng;
@@ -355,14 +355,17 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
-        // Allow all origins
-        // let cors = Cors::default()
-            // .allow_any_origin()
-            // .allow_any_method()
-            // .allow_any_header();
+        // Allow only origin from https://chat.ducky.pics or https://chatgpt.ducky.pics
+        let cors = Cors::default()
+            .allowed_origin("https://chat.ducky.pics")
+            .allowed_origin("https://chatgpt.ducky.pics")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
 
         App::new()
-            // .wrap(cors)
+            .wrap(cors)
             .service(generate)
             .service(login)
             .service(register)
