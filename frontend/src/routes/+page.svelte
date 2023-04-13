@@ -129,9 +129,9 @@
 			required
 		/>
 		<!-- Optionally a first-time token to then create the password -->
-		<a href="/register" class=" border-blue-400 p-2 text-sm text-blue-400  hover:text-blue-500"
-			>Register</a
-		>
+		<a href="/register" class=" border-blue-400 pt-1 text-xs text-blue-400 hover:text-blue-500">
+			Register
+		</a>
 
 		<button
 			type="submit"
@@ -149,11 +149,10 @@
 		class="m-4 flex h-full flex-col items-center justify-center rounded-lg border-2 border-gray-400 bg-gray-200 p-4 shadow-md dark:bg-gray-800 md:w-1/2 lg:w-1/3"
 	>
 		<p>
-			Login using a <a
-				href="https://platform.openai.com/account/api-keys"
-				target="_blank"
-				class="text-blue-400">token</a
-			>
+			Login using an official
+			<a href="https://platform.openai.com/account/api-keys" target="_blank" class="text-blue-400">
+				OpenAI token
+			</a>
 		</p>
 		<label for="token">Token</label>
 		<input
