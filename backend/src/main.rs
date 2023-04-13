@@ -1,5 +1,6 @@
 use actix_cors::Cors;
-use actix_web::{http, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::http::header;
+use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
 // use chrono::Utc;
 use dotenv::dotenv;
 use rand::Rng;
@@ -358,10 +359,9 @@ async fn main() -> std::io::Result<()> {
         // Allow only chat.ducky.pics to access the API
         let cors = Cors::default()
             .allowed_origin("https://chat.ducky.pics")
-            .allowed_methods(vec!["GET", "POST"]) // OPTIONS not needed because actix_cors handles it automatically
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
-            .send_wildcard()
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+            .allowed_header(header::CONTENT_TYPE)
             .max_age(3600);
 
         App::new()
