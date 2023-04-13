@@ -355,8 +355,14 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
-        let cors = Cors::permissive();
-        // TODO: Make this more secure by only allowing the chat.ducky.pics domain
+        // Allow only chat.ducky.pics to access the API
+        let cors = Cors::default()
+            .allowed_origin("https://chat.ducky.pics")
+            .allowed_methods(vec!["GET", "POST"]) // OPTIONS not needed because actix_cors handles it automatically
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .send_wildcard()
+            .max_age(3600);
 
         App::new()
             .wrap(cors)
