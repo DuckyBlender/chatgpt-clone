@@ -87,30 +87,13 @@
 	}
 
 	function saveMessages() {
-		let text = '';
-		messages.forEach((msg) => {
-			text += msg.name + ': ' + msg.message + '\n';
-		});
-
-		// Create a Blob with the text content
-		let blob = new Blob([encodeURIComponent(text)], { type: 'text/plain;charset=utf-8' });
-
-		// Create a URL to represent the Blob
-		let url = URL.createObjectURL(blob);
-
-		let element = document.createElement('a');
-		element.setAttribute('href', url);
-		element.setAttribute('download', 'chat.txt');
-
-		element.style.display = 'none';
-		document.body.appendChild(element);
-
-		// Trigger the click event to start the download
-		element.click();
-
-		// Remove the link from the document and revoke the URL to free up memory
-		document.body.removeChild(element);
-		URL.revokeObjectURL(url);
+		// Save the messages using the messages list. Also keep in mind UTF-8 encoding
+		let encodedMessages = encodeURIComponent(JSON.stringify(messages));
+		// Make download link
+		let link = document.createElement('a');
+		link.href = 'data:text/plain;charset=utf-8,' + encodedMessages;
+		link.download = 'messages.txt';
+		link.click();
 	}
 
 	// add messages to the array
