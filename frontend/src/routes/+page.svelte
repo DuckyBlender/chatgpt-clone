@@ -132,16 +132,6 @@
 		<a href="/register" class=" border-blue-400 p-2 text-sm text-blue-400  hover:text-blue-500"
 			>Register</a
 		>
-		<!-- <label for="token">Register token</label>
-		<input
-			type="password"
-			name="registerToken"
-			id="registerToken"
-			class="w-full rounded-md bg-gray-300 text-slate-800 dark:bg-gray-700 dark:text-gray-200"
-			placeholder="xxxx-xxxx-xxxx-xxxx"
-			bind:value={registerToken}
-			on:input={checkPassword}
-		/> -->
 
 		<button
 			type="submit"
@@ -154,8 +144,9 @@
 		</button>
 	</div>
 	<p class="w-full text-center md:hidden">Or</p>
+
 	<div
-		class="m-4 flex w-full flex-col items-center justify-center rounded-lg border-2 border-gray-400 bg-gray-200 p-4 shadow-md dark:bg-gray-800 md:w-1/2 lg:w-1/3"
+		class="m-4 flex h-full flex-col items-center justify-center rounded-lg border-2 border-gray-400 bg-gray-200 p-4 shadow-md dark:bg-gray-800 md:w-1/2 lg:w-1/3"
 	>
 		<p>
 			Login using a <a
